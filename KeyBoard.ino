@@ -6,6 +6,7 @@
  */
 
 #include <avr/io.h>
+#include "binary.h"
 
 //Sample frequency in Hz
 #define SAMPLE_FREQUENCY 62500
@@ -15,6 +16,7 @@
 #define PIND_RELEVANT (PIND>>2)
 //The no-operation function as defined in assembly language
 #define nop() __asm__("nop\n\t")
+
 /**
  * \var key_0
  * \brief Stores state of keys 0 to 5, same goes for key_6, key_12 etc. Only the 6 LSB are relevant on these variables.
@@ -28,10 +30,16 @@ uint8_t keys_30;
 uint8_t buttons_settings;
 
 /**
- * \var number of lowest key, indeed 1 for C1, to for C2, etc
+ * \var pitch
+ * \brief index of the lowest key, 0 for C0, 2 for D0, 12 for C1...
  */
-int8_t octave;
+int8_t pitch=2;
 
+/**
+ * \var t
+ * \brief time in micro second
+ */
+uint64_t t=0;
 
 /**
  * \fn void init_timer_1()
@@ -41,17 +49,17 @@ void init_timer_1(){
   //Enable timer1 with no prescaler, cf doc p110
   TCCR1B &= ~0x07; //Clears bits CS10:12 that handle timer activation
   TCCR1B |= 0x01; //The timer is supposed to count at 16 Mhz, an external precision clock could be used if necessary
-  
+
   //Disable noise canceling for input
   TCCR1B &= ~0x07;
-  
+
   //Reset counter value
   TCNT1 = 0;
-  
+
   //Enable only OVF interrupts, cf doc p112
   TIMSK1 = 0;
   TIMSK1 |= 0x01;
-   
+
   //Timer 1 in fast PWM mode, cf p108, WGM13:10 = 1110
   TCCR1A &= ~0x03; //Clear bits WGM10:11
   TCCR1A |= 0x02; //Set WGM11 to 1
@@ -87,12 +95,12 @@ void init_pins(){
   //Built-in led also on PB5 as output
   DDRB |= 0x3F;
   //Turning on all outputs for now
-  PORTB |= 0x3D; 
+  PORTB |= 0x3D;
 
-  //PortC 0:1 as output for keys 31 to 36 and buttons options
-  DDRC |= 0x03;
+  //PortC 0:2 as output for keys 31 to 36 and buttons settings 1 and 2
+  DDRC |= 0x07;
   //Turning on all outputs for now
-  PORTC |= 0x03; 
+  PORTC |= 0x07;
 }
 
 /**
@@ -100,6 +108,7 @@ void init_pins(){
  * \brief Disables some default functionnalities provided by Arduino IDE
  */
 void disable_ide_stuff(){
+  //TODO
   //Disable timer_0, which interrupts to provide delay and millis functions
 }
 
@@ -108,8 +117,11 @@ void disable_ide_stuff(){
  * \brief interruption code when an ovf occurs on timer 1
  */
 ISR(TIMER1_OVF_vect){
-  //First of all, update duty-cycle OCR1A
-  //TODO
+  //Let us update time
+  t += SAMPLE_TIME;
+
+  //Let us compute the analog output value by checking each key, this will be the new duty-cycle OCR1A
+  analog_out = 0;
 
   //Write MIDI messages to serial port
   //TODO
@@ -133,51 +145,57 @@ int main(){
   //Enable interrupts
   SREG |= 0x80;
 
-  while(1){    
+  while(1){
     //Checking keys 0:5 by setting PB0 to 0
     PORTB &= ~0x01;
-    nop(); 
+    nop();
     keys_0 = ~(PIND>>2);
     PORTB |= 0x01;
 
     //Checking keys 6:11 by setting PB2 to 0
     PORTB &= ~0x04;
-    nop(); 
+    nop();
     keys_6 = ~(PIND>>2);
     PORTB |= 0x04;
-    
+
     //Checking keys 12:17 by setting PB3 to 0
     PORTB &= ~0x08;
     nop();
     keys_12 = ~(PIND>>2);
     PORTB |= 0x08;
-    
+
     //Checking keys 18:23 by setting PB4 to 0
     PORTB &= ~0x10;
     nop();
     keys_18 = ~(PIND>>2);
     PORTB |= 0x10;
-    
+
     //Checking keys 24:29 by setting PB5 to 0
     PORTB &= ~0x20;
     nop();
     keys_24 = ~(PIND>>2);
     PORTB |= 0x20;
-    
+
     //Checking keys 30:35 by setting PC0 to 0
     PORTC &= ~0x01;
     nop();
     keys_30 = ~(PIND>>2);
     PORTB |= 0x01;
-    
-    //Checking buttons_settings by setting PC1 to 0
+
+    //Checking buttons_settings_1 by setting PC1 to 0
     PORTB &= ~0x02;
     nop();
     buttons_settings = ~(PIND>>2);
     PORTB |= 0x02;
 
+    //Checking buttons_settings_2 by setting PC2 to 0
+    PORTB &= ~0x04;
+    nop();
+    buttons_settings = ~(PIND>>2);
+    PORTB |= 0x04;
+
     //TODO : set output signal to right value according to all pressed keys
-    
+
     //TOREMOVE : sets PC5 to high by putting PD2 to GND and to low by putting PD3 to GND
     if(keys_0 & 0x01) PORTC |= 0x20;
     if(keys_0 & 0x02) PORTC &= ~0x20;
