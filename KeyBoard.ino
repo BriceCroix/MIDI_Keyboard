@@ -16,6 +16,25 @@
 #define PIND_RELEVANT (PIND>>2)
 //The no-operation function as defined in assembly language
 #define nop() __asm__("nop\n\t")
+//The analog amplitude for one note, defining how many notes can be played at once, here 8 notes because 8*32 = 256
+#define NOTE_AMP 32
+//Number of notes per octave
+#define OCTAVE 12
+
+//Each period in us from C0 to B8
+const uint16_t PERIODS[] = {
+  61156, 57724, 54484, 51426, 48540, 45815, 43244, 40817, 38526, 36364, 34323, 32396, //C0 to B0
+  30578, 28862, 27242, 25713, 24270, 22908, 21622, 20408, 19263, 18182, 17161, 16198, //C1 to B1
+  15289, 14431, 13621, 12856, 12135, 11454, 10811, 10204, 9631,  9091,  8581,  8099,  //C2 to B2
+  7645,  7215,  6810,  6428,  6067,  5727,  5405,  5102,  4816,  4545,  4290,  4050,  //C3 to B3
+  3822,  3608,  3405,  3214,  3034,  2863,  2703,  2551,  2408,  2273,  2145,  2025,  //C4 to B4
+  1911,  1804,  1703,  1607,  1517,  1432,  1351,  1276,  1204,  1136,  1073,  1012,  //C5 to B5
+  956,   902,   851,   804,   758,   716,   676,   638,   602,   568,   536,   506,   //C6 to B6
+  478,   451,   426,   402,   379,   358,   338,   319,   301,   284,   268,   253,   //C7 to B7
+  239,   225,   213,   201,   190,   179,   169,   159,   150,   142,   134,   127    //C8 to B8
+};
+
+
 
 /**
  * \var key_0
@@ -27,19 +46,26 @@ uint8_t keys_12;
 uint8_t keys_18;
 uint8_t keys_24;
 uint8_t keys_30;
-uint8_t buttons_settings;
+uint8_t buttons_settings_1;
+uint8_t buttons_settings_2;
 
 /**
  * \var pitch
  * \brief index of the lowest key, 0 for C0, 2 for D0, 12 for C1...
  */
-int8_t pitch=2;
+uint8_t pitch=2;
 
 /**
  * \var t
  * \brief time in micro second
  */
 uint64_t t=0;
+
+/**
+ * \var analog_out
+ * \brief the analog value to write on the analog output
+ */
+uint8_t analog_out=0;
 
 /**
  * \fn void init_timer_1()
@@ -71,8 +97,8 @@ void init_timer_1(){
   TCCR1A &= ~0xF0;
   TCCR1A |= 0x80;
 
-  //Initial duty cycle of 50%
-  OCR1A = 0x008F;
+  //Initial duty cycle of 0%
+  OCR1A = 0x0000;
 
   //N.B. OC1A (channel A) output is on pin 9 and OC1B on pin 10
 }
@@ -120,11 +146,34 @@ ISR(TIMER1_OVF_vect){
   //Let us update time
   t += SAMPLE_TIME;
 
-  //Let us compute the analog output value by checking each key, this will be the new duty-cycle OCR1A
-  analog_out = 0;
-
   //Write MIDI messages to serial port
   //TODO
+}
+
+/**
+ * \fn void setAnalogOut()
+ * \brief Sets the analog_out value according to the keys state. WARNING : Output should not be written while this function is computing
+ */
+void setAnalogOut(){
+  uint8_t current_pitch = pitch; //In order not to access memory multiple times
+  //Resetting analog_out
+  analog_out=0;
+  //Variable to store current considered period
+  uint16_t T;
+
+  if(keys_0 & 0x01){
+    T = PERIODS[current_pitch]; //We don't want to access this array two times
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_0 & 0x02){
+    T = PERIODS[current_pitch+1]; //We don't want to access this array two times
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  //TODO : remaining 34 keys
 }
 
 /**
@@ -134,72 +183,61 @@ ISR(TIMER1_OVF_vect){
 int main(){
   //Disable interrupts while initializing, cf p11
   SREG &= ~0x80;
-
   //TOREMOVE : sets pin A5 to output, low level
   DDRC |= 0x20;
   PORTC &= ~0x20;
-
   init_timer_1();
   init_pins();
-
   //Enable interrupts
   SREG |= 0x80;
 
   while(1){
-    //Checking keys 0:5 by setting PB0 to 0
+    //Checking keys 0:5 by setting PB0 to 0, a no_operation is required for sync, see datasheet p60
     PORTB &= ~0x01;
     nop();
     keys_0 = ~(PIND>>2);
     PORTB |= 0x01;
-
     //Checking keys 6:11 by setting PB2 to 0
     PORTB &= ~0x04;
     nop();
     keys_6 = ~(PIND>>2);
     PORTB |= 0x04;
-
     //Checking keys 12:17 by setting PB3 to 0
     PORTB &= ~0x08;
     nop();
     keys_12 = ~(PIND>>2);
     PORTB |= 0x08;
-
     //Checking keys 18:23 by setting PB4 to 0
     PORTB &= ~0x10;
     nop();
     keys_18 = ~(PIND>>2);
     PORTB |= 0x10;
-
     //Checking keys 24:29 by setting PB5 to 0
     PORTB &= ~0x20;
     nop();
     keys_24 = ~(PIND>>2);
     PORTB |= 0x20;
-
     //Checking keys 30:35 by setting PC0 to 0
     PORTC &= ~0x01;
     nop();
     keys_30 = ~(PIND>>2);
-    PORTB |= 0x01;
-
+    PORTC |= 0x01;
     //Checking buttons_settings_1 by setting PC1 to 0
-    PORTB &= ~0x02;
+    PORTC &= ~0x02;
     nop();
-    buttons_settings = ~(PIND>>2);
-    PORTB |= 0x02;
-
+    buttons_settings_1 = ~(PIND>>2);
+    PORTC |= 0x02;
     //Checking buttons_settings_2 by setting PC2 to 0
-    PORTB &= ~0x04;
+    PORTC &= ~0x04;
     nop();
-    buttons_settings = ~(PIND>>2);
-    PORTB |= 0x04;
-
-    //TODO : set output signal to right value according to all pressed keys
+    buttons_settings_2 = ~(PIND>>2);
+    PORTC |= 0x04;
 
     //TOREMOVE : sets PC5 to high by putting PD2 to GND and to low by putting PD3 to GND
     if(keys_0 & 0x01) PORTC |= 0x20;
     if(keys_0 & 0x02) PORTC &= ~0x20;
   }
   //Program won't actually go outside this loop
+
   return EXIT_SUCCESS;
 }
