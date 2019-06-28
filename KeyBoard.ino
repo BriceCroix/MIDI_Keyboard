@@ -53,7 +53,7 @@ uint8_t buttons_settings_2;
  * \var pitch
  * \brief index of the lowest key, 0 for C0, 2 for D0, 12 for C1...
  */
-uint8_t pitch=2;
+uint8_t pitch=24;
 
 /**
  * \var t
@@ -143,9 +143,12 @@ void disable_ide_stuff(){
  * \brief interruption code when an ovf occurs on timer 1
  */
 ISR(TIMER1_OVF_vect){
+  //Let us update the analog pin output value, computed at last interruption
+  OCR1A = analog_out;
   //Let us update time
   t += SAMPLE_TIME;
-
+  //Let us update analog_out for next interruption, indeed next sample
+  setAnalogOut();
   //Write MIDI messages to serial port
   //TODO
 }
@@ -155,11 +158,12 @@ ISR(TIMER1_OVF_vect){
  * \brief Sets the analog_out value according to the keys state. WARNING : Output should not be written while this function is computing
  */
 void setAnalogOut(){
-  uint8_t current_pitch = pitch; //In order not to access memory multiple times
-  //Resetting analog_out
-  analog_out=0;
+  //In order not to access memory multiple times
+  uint8_t current_pitch = pitch;
   //Variable to store current considered period
   uint16_t T;
+  //Resetting analog_out
+  analog_out=0;
 
   if(keys_0 & 0x01){
     T = PERIODS[current_pitch]; //We don't want to access this array two times
@@ -168,12 +172,215 @@ void setAnalogOut(){
     }
   }
   if(keys_0 & 0x02){
-    T = PERIODS[current_pitch+1]; //We don't want to access this array two times
+    T = PERIODS[current_pitch+1];
     if(t%T < ( T >> 1) ){
       analog_out += NOTE_AMP;
     }
   }
-  //TODO : remaining 34 keys
+  if(keys_0 & 0x04){
+    T = PERIODS[current_pitch+2];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_0 & 0x08){
+    T = PERIODS[current_pitch+3];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_0 & 0x10){
+    T = PERIODS[current_pitch+4];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_0 & 0x20){
+    T = PERIODS[current_pitch+5];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_6 & 0x01){
+    T = PERIODS[current_pitch+6];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_6 & 0x02){
+    T = PERIODS[current_pitch+7];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_6 & 0x04){
+    T = PERIODS[current_pitch+8];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_6 & 0x08){
+    T = PERIODS[current_pitch+9];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_6 & 0x10){
+    T = PERIODS[current_pitch+10];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_6 & 0x20){
+    T = PERIODS[current_pitch+11];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_12 & 0x01){
+    T = PERIODS[current_pitch+12];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_12 & 0x02){
+    T = PERIODS[current_pitch+13];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_12 & 0x04){
+    T = PERIODS[current_pitch+14];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_12 & 0x08){
+    T = PERIODS[current_pitch+15];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_12 & 0x10){
+    T = PERIODS[current_pitch+16];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_12 & 0x20){
+    T = PERIODS[current_pitch+17];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_18 & 0x01){
+    T = PERIODS[current_pitch+18];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_18 & 0x02){
+    T = PERIODS[current_pitch+19];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_18 & 0x04){
+    T = PERIODS[current_pitch+20];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_18 & 0x08){
+    T = PERIODS[current_pitch+21];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_18 & 0x10){
+    T = PERIODS[current_pitch+22];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_18 & 0x20){
+    T = PERIODS[current_pitch+23];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_24 & 0x01){
+    T = PERIODS[current_pitch+24];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_24 & 0x02){
+    T = PERIODS[current_pitch+25];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_24 & 0x04){
+    T = PERIODS[current_pitch+26];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_24 & 0x08){
+    T = PERIODS[current_pitch+27];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_24 & 0x10){
+    T = PERIODS[current_pitch+28];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_24 & 0x20){
+    T = PERIODS[current_pitch+29];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_30 & 0x01){
+    T = PERIODS[current_pitch+30];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_30 & 0x02){
+    T = PERIODS[current_pitch+31];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_30 & 0x04){
+    T = PERIODS[current_pitch+32];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_30 & 0x08){
+    T = PERIODS[current_pitch+33];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_30 & 0x10){
+    T = PERIODS[current_pitch+34];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
+  if(keys_30 & 0x20){
+    T = PERIODS[current_pitch+35];
+    if(t%T < ( T >> 1) ){
+      analog_out += NOTE_AMP;
+    }
+  }
 }
 
 /**
@@ -239,5 +446,5 @@ int main(){
   }
   //Program won't actually go outside this loop
 
-  return EXIT_SUCCESS;
+  return EXIT_FAILURE;
 }
