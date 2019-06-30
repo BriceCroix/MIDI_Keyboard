@@ -4,14 +4,15 @@
  * \author Brice Croix
  * \date june 25 of 2019
  */
+#define DEBUG
 
 #include <avr/io.h>
 #include "binary.h"
 
 //Sample frequency in Hz
-#define SAMPLE_FREQUENCY 62500
+#define SAMPLE_FREQUENCY 31250
 //Sample time in micro second
-#define SAMPLE_TIME 16
+#define SAMPLE_TIME 32
 //The following macros takes the PIND register as bVVVVVVXX and returns b00VVVVVV since there are pull-ups most bits will be 1 by except with pressed keys which will be 0
 #define PIND_RELEVANT (PIND>>2)
 //The no-operation function as defined in assembly language
@@ -40,12 +41,12 @@ const uint16_t PERIODS[] = {
  * \var key_0
  * \brief Stores state of keys 0 to 5, same goes for key_6, key_12 etc. Only the 6 LSB are relevant on these variables.
  */
-uint8_t keys_0;
-uint8_t keys_6;
-uint8_t keys_12;
-uint8_t keys_18;
-uint8_t keys_24;
-uint8_t keys_30;
+volatile uint8_t keys_0;
+volatile uint8_t keys_6;
+volatile uint8_t keys_12;
+volatile uint8_t keys_18;
+volatile uint8_t keys_24;
+volatile uint8_t keys_30;
 uint8_t buttons_settings_1;
 uint8_t buttons_settings_2;
 
@@ -59,7 +60,7 @@ uint8_t pitch=24;
  * \var t
  * \brief time in micro second
  */
-uint64_t t=0;
+volatile uint64_t t=0;
 
 /**
  * \var analog_out
@@ -74,10 +75,7 @@ uint8_t analog_out=0;
 void init_timer_1(){
   //Enable timer1 with no prescaler, cf doc p110
   TCCR1B &= ~0x07; //Clears bits CS10:12 that handle timer activation
-  TCCR1B |= 0x01; //The timer is supposed to count at 16 Mhz, an external precision clock could be used if necessary
-
-  //Disable noise canceling for input
-  TCCR1B &= ~0x07;
+  TCCR1B |= (1<<CS10); //The timer is supposed to count at 16 Mhz, an external precision clock could be used if necessary
 
   //Reset counter value
   TCNT1 = 0;
@@ -88,14 +86,14 @@ void init_timer_1(){
 
   //Timer 1 in fast PWM mode, cf p108, WGM13:10 = 1110
   TCCR1A &= ~0x03; //Clear bits WGM10:11
-  TCCR1A |= 0x02; //Set WGM11 to 1
-  TCCR1B |= 0x18; //Set WGM13:12 to 1
+  TCCR1A |= 1<<WGM11; //Set WGM11 to 1
+  TCCR1B |= 1<<WGM13 | 1<<WGM12; //Set WGM13:12 to 1
   //In this mode the Auto-Reload value (TOP, or ARR for a STM32) is in the Input Capture Register
-  ICR1 = 0x00FF; //Sampling Frequency = 62745 Hz
+  ICR1 = 0x01FF; //Sampling Frequency = 31250 Hz with 9 bits resolution
 
   //Connect OC1A to pin PB1 in non-inverting PWM mode, cf p108
   TCCR1A &= ~0xF0;
-  TCCR1A |= 0x80;
+  TCCR1A |= 1<<COM1A1;
 
   //Initial duty cycle of 0%
   OCR1A = 0x0000;
@@ -112,14 +110,14 @@ void init_pins(){
   MCUCR &= ~0x10;
 
   //PortD 2:7 as input for all buttons, this will allow to get all values in one instruction
-  DDRD &= ~0xFC;
+  DDRD &= ~(1<<DDD2 | 1<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7);
   //Put pins PD2:7 to pull-up
-  PORTD |= 0xFC;
+  PORTD |= B11111100;
 
   //PWM output OCA1, which is on PB1, aka Pin9
   //PortB 0 and 2:5 as output for buttons from Keys 0 to 30
   //Built-in led also on PB5 as output
-  DDRB |= 0x3F;
+  DDRB |= (1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5);
   //Turning on all outputs for now
   PORTB |= 0x3D;
 
@@ -129,6 +127,22 @@ void init_pins(){
   PORTC |= 0x07;
 }
 
+/**
+ * \fn init_serial()
+ * \brief initialize the serial peripheral interface
+ */
+void init_serial(){
+  //Enable SPI
+  SPCR |= 0x40;
+  //Disable SPI interrupts
+  SPCR &= ~0x80;
+  //LSB first
+  SPCR |= 0x20;
+  //Master mode
+  SPCR |= 0x10;
+  //Baud rate
+  Serial.begin(9600);
+}
 /**
  * \fn disable_ide_stuff()
  * \brief Disables some default functionnalities provided by Arduino IDE
@@ -150,7 +164,10 @@ ISR(TIMER1_OVF_vect){
   //Let us update analog_out for next interruption, indeed next sample
   setAnalogOut();
   //Write MIDI messages to serial port
+#ifdef DEBUG
   //TODO
+  Serial.print("tim1 ovf\n");
+#endif
 }
 
 /**
@@ -390,11 +407,14 @@ void setAnalogOut(){
 int main(){
   //Disable interrupts while initializing, cf p11
   SREG &= ~0x80;
+#ifdef DEBUG
   //TOREMOVE : sets pin A5 to output, low level
   DDRC |= 0x20;
   PORTC &= ~0x20;
+#endif
   init_timer_1();
   init_pins();
+  init_serial();
   //Enable interrupts
   SREG |= 0x80;
 
@@ -440,9 +460,21 @@ int main(){
     buttons_settings_2 = ~(PIND>>2);
     PORTC |= 0x04;
 
+#ifdef DEBUG
     //TOREMOVE : sets PC5 to high by putting PD2 to GND and to low by putting PD3 to GND
-    if(keys_0 & 0x01) PORTC |= 0x20;
-    if(keys_0 & 0x02) PORTC &= ~0x20;
+    if(keys_0 & 0x01){
+      PORTC |= 0x20;
+      Serial.print("k0\n");
+    }
+    if(keys_0 & 0x02){
+      PORTC &= ~0x20;
+      Serial.print("k1\n");
+    }
+    if(keys_0 & 0x04){
+      PORTC |= 0x20;
+      Serial.print("k2\n");
+    }
+#endif
   }
   //Program won't actually go outside this loop
 
