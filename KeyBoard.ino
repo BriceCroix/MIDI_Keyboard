@@ -66,7 +66,13 @@ volatile uint64_t t=0;
  * \var analog_out
  * \brief the analog value to write on the analog output
  */
-uint8_t analog_out=0;
+volatile uint16_t analog_out=0;
+
+/**
+ * \var flag_analog_out_ready
+ * \brief a flag to indicate that the analog value is relevant to write on physical pin
+ */
+volatile uint8_t flag_analog_out_ready=1;
 
 /**
  * \fn void init_timer_1()
@@ -122,7 +128,7 @@ void init_pins(){
   PORTB |= 0x3D;
 
   //PortC 0:2 as output for keys 31 to 36 and buttons settings 1 and 2
-  DDRC |= 0x07;
+  DDRC |= (1<<DDC0 | 1<<DDC1 | 1<<DDC2);
   //Turning on all outputs for now
   PORTC |= 0x07;
 }
@@ -157,17 +163,13 @@ void disable_ide_stuff(){
  * \brief interruption code when an ovf occurs on timer 1
  */
 ISR(TIMER1_OVF_vect){
-  //Let us update the analog pin output value, computed at last interruption
-  OCR1A = analog_out;
   //Let us update time
   t += SAMPLE_TIME;
-  //Let us update analog_out for next interruption, indeed next sample
-  setAnalogOut();
+
+  //Let us update the analog pin output value if it is relevant
+  if(flag_analog_out_ready) OCR1A = analog_out;
   //Write MIDI messages to serial port
-#ifdef DEBUG
   //TODO
-  Serial.print("tim1 ovf\n");
-#endif
 }
 
 /**
@@ -179,6 +181,8 @@ void setAnalogOut(){
   uint8_t current_pitch = pitch;
   //Variable to store current considered period
   uint16_t T;
+  //Indicating that analog output is no longer relevant
+  flag_analog_out_ready=0;
   //Resetting analog_out
   analog_out=0;
 
@@ -398,6 +402,8 @@ void setAnalogOut(){
       analog_out += NOTE_AMP;
     }
   }
+  //Indicating that the analog value is now relevant
+  flag_analog_out_ready=1;
 }
 
 /**
@@ -460,6 +466,7 @@ int main(){
     buttons_settings_2 = ~(PIND>>2);
     PORTC |= 0x04;
 
+    setAnalogOut();
 #ifdef DEBUG
     //TOREMOVE : sets PC5 to high by putting PD2 to GND and to low by putting PD3 to GND
     if(keys_0 & 0x01){
