@@ -427,42 +427,42 @@ int main(){
     //Checking keys 0:5 by setting PB0 to 0, a no_operation is required for sync, see datasheet p60
     PORTB &= ~0x01;
     nop();
-    keys_0 = ~(PIND>>2);
+    keys_0 = ~((uint8_t)PIND>>2);
     PORTB |= 0x01;
     //Checking keys 6:11 by setting PB2 to 0
     PORTB &= ~0x04;
     nop();
-    keys_6 = ~(PIND>>2);
+    keys_6 = ~((uint8_t)PIND>>2);
     PORTB |= 0x04;
     //Checking keys 12:17 by setting PB3 to 0
     PORTB &= ~0x08;
     nop();
-    keys_12 = ~(PIND>>2);
+    keys_12 = ~((uint8_t)PIND>>2);
     PORTB |= 0x08;
     //Checking keys 18:23 by setting PB4 to 0
     PORTB &= ~0x10;
     nop();
-    keys_18 = ~(PIND>>2);
+    keys_18 = ~((uint8_t)PIND>>2);
     PORTB |= 0x10;
     //Checking keys 24:29 by setting PB5 to 0
     PORTB &= ~0x20;
     nop();
-    keys_24 = ~(PIND>>2);
+    keys_24 = ~((uint8_t)PIND>>2);
     PORTB |= 0x20;
     //Checking keys 30:35 by setting PC0 to 0
     PORTC &= ~0x01;
     nop();
-    keys_30 = ~(PIND>>2);
+    keys_30 = ~((uint8_t)PIND>>2);
     PORTC |= 0x01;
     //Checking buttons_settings_1 by setting PC1 to 0
     PORTC &= ~0x02;
     nop();
-    buttons_settings_1 = ~(PIND>>2);
+    buttons_settings_1 = ~((uint8_t)PIND>>2);
     PORTC |= 0x02;
     //Checking buttons_settings_2 by setting PC2 to 0
     PORTC &= ~0x04;
     nop();
-    buttons_settings_2 = ~(PIND>>2);
+    buttons_settings_2 = ~((uint8_t)PIND>>2);
     PORTC |= 0x04;
 
     setAnalogOut();
