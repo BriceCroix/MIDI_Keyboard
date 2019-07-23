@@ -18,9 +18,11 @@
 //The no-operation function as defined in assembly language
 #define nop() __asm__("nop\n\t")
 //The analog amplitude for one note, defining how many notes can be played at once, here 8 notes because 8*32 = 256
-#define NOTE_AMP 32
+#define NOTE_AMP 64
 //Number of notes per octave
 #define OCTAVE 12
+//Minimum duty value for analog output, notice NOTE_AMP/2
+#define PWM_MIN 32
 
 //Each period in us from C0 to B8
 const uint16_t PERIODS[] = {
@@ -101,8 +103,10 @@ void init_timer_1(){
   TCCR1A &= ~0xF0;
   TCCR1A |= 1<<COM1A1;
 
-  //Initial duty cycle of 0%
-  OCR1A = 0x0000;
+  /*arbitrary min value, 512 as ARR authorize 8 notes of 64 as velocity
+   let us use 32 as min value and 480 as max, this means that it will
+   saturate above 7 simultaneous notes*/
+  OCR1A = PWM_MIN;
 
   //N.B. OC1A (channel A) output is on pin 9 and OC1B on pin 10
 }
@@ -184,7 +188,7 @@ void setAnalogOut(){
   //Indicating that analog output is no longer relevant
   flag_analog_out_ready=0;
   //Resetting analog_out
-  analog_out=0;
+  analog_out=PWM_MIN;
 
   if(keys_0 & 0x01){
     T = PERIODS[current_pitch]; //We don't want to access this array two times
