@@ -417,11 +417,6 @@ void setAnalogOut(){
 int main(){
   //Disable interrupts while initializing, cf p11
   SREG &= ~0x80;
-#ifdef DEBUG
-  //TOREMOVE : sets pin A5 to output, low level
-  DDRC |= 0x20;
-  PORTC &= ~0x20;
-#endif
   init_timer_1();
   init_pins();
   init_serial();
@@ -474,15 +469,12 @@ int main(){
 #ifdef DEBUG
     //TOREMOVE : sets PC5 to high by putting PD2 to GND and to low by putting PD3 to GND
     if(keys_0 & 0x01){
-      PORTC |= 0x20;
       Serial.print("k0\n");
     }
     if(keys_0 & 0x02){
-      PORTC &= ~0x20;
       Serial.print("k1\n");
     }
     if(keys_0 & 0x04){
-      PORTC |= 0x20;
       Serial.print("k2\n");
     }
 #endif
