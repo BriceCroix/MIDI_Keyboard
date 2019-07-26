@@ -23,6 +23,13 @@
 #define OCTAVE 12
 //Minimum duty value for analog output, notice NOTE_AMP/2
 #define PWM_MIN 32
+//Masks to check keys level in a key group
+#define KEY_0_MSK 0x01
+#define KEY_1_MSK 0x02
+#define KEY_2_MSK 0x04
+#define KEY_3_MSK 0x08
+#define KEY_4_MSK 0x10
+#define KEY_5_MSK 0x20
 
 //Each period in us from C0 to B8
 const uint16_t PERIODS[] = {
@@ -40,7 +47,7 @@ const uint16_t PERIODS[] = {
 
 
 /**
- * \var key_0
+ * \var keys_0
  * \brief Stores state of keys 0 to 5, same goes for key_6, key_12 etc. Only the 6 LSB are relevant on these variables.
  */
 volatile uint8_t keys_0;
@@ -53,28 +60,39 @@ uint8_t buttons_settings_1;
 uint8_t buttons_settings_2;
 
 /**
- * \var pitch
+ * \var keys_0_last
+ * \brief stores the state of the keys at last sample
+ */
+volatile uint8_t keys_0_last;
+volatile uint8_t keys_6_last;
+volatile uint8_t keys_12_last;
+volatile uint8_t keys_18_last;
+volatile uint8_t keys_24_last;
+volatile uint8_t keys_30_last;
+
+/**
+ * \var pitch_0
  * \brief index of the lowest key, 0 for C0, 2 for D0, 12 for C1...
  */
-uint8_t pitch=24;
+uint8_t pitch_0 = 24;
 
 /**
  * \var t
  * \brief time in micro second
  */
-volatile uint64_t t=0;
+volatile uint64_t t = 0;
 
 /**
  * \var analog_out
  * \brief the analog value to write on the analog output
  */
-volatile uint16_t analog_out=0;
+volatile uint16_t analog_out = 0;
 
 /**
- * \var flag_analog_out_ready
- * \brief a flag to indicate that the analog value is relevant to write on physical pin
+ * \var flag_request_update
+ * \brief a flag to indicate that the analog output value needs to be updated
  */
-volatile uint8_t flag_analog_out_ready=1;
+volatile uint8_t flag_request_update
 
 /**
  * \fn void init_timer_1()
@@ -169,11 +187,19 @@ void disable_ide_stuff(){
 ISR(TIMER1_OVF_vect){
   //Let us update time
   t += SAMPLE_TIME;
+  //Let us update the analog pin output value
+  OCR1A = analog_out;
+  //Request an output update
+  flag_request_update = 1;
+}
 
-  //Let us update the analog pin output value if it is relevant
-  if(flag_analog_out_ready) OCR1A = analog_out;
-  //Write MIDI messages to serial port
-  //TODO
+uint8_t getSquareWave(t, period){
+  if(t%period < (period>>1)){
+    //High
+    return NOTE_AMP;
+  }else{
+    //Low
+    return 0;
 }
 
 /**
@@ -182,232 +208,39 @@ ISR(TIMER1_OVF_vect){
  */
 void setAnalogOut(){
   //In order not to access memory multiple times
-  uint8_t current_pitch = pitch;
+  uint8_t current_pitch_0 = pitch_0;
   //Variable to store current considered period
   uint16_t T;
-  //Indicating that analog output is no longer relevant
-  flag_analog_out_ready=0;
-  //Resetting analog_out
-  analog_out=PWM_MIN;
+  //Variable to temporarily store wave value at given time
+  uint8_t value_current = 0;
+  //Variable to store wave value at last sample
+  uint8_t value_last = 0;
 
-  if(keys_0 & 0x01){
-    T = PERIODS[current_pitch]; //We don't want to access this array two times
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
+  //Is first key pressed ?
+  if(keys_0 & KEY_0_MSK){
+    //If first key pressed, was it pressed last sample ?
+    if(keys_0_last & KEY_0_MSK){
+      //If was pressed
+      value_current = getSquareWave(t,T);
+      value_last = getSquareWave(t-SAMPLE_TIME,T)
+      analog_out += (value_current-value_last)
+    }else{
+      //Was not pressed last sample, it is a change
+      //TODO: WRITE MIDI NOTEON
+      value_current = getSquareWave(t,T);
+      analog_out += value_current;
     }
-  }
-  if(keys_0 & 0x02){
-    T = PERIODS[current_pitch+1];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
+  }else{
+    //The first key is not pressed, was it pressed last sample ?
+    if(keys_0_last & KEY_0_MSK){
+      //If was pressed, it is a change
+      //TODO: WRITE MIDI NOTEOFF
+      value_current = getSquareWave(t,T);
+      analog_out -= value_current;
     }
+    //Nothing to do if key not pressed and was not pressed
   }
-  if(keys_0 & 0x04){
-    T = PERIODS[current_pitch+2];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_0 & 0x08){
-    T = PERIODS[current_pitch+3];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_0 & 0x10){
-    T = PERIODS[current_pitch+4];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_0 & 0x20){
-    T = PERIODS[current_pitch+5];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_6 & 0x01){
-    T = PERIODS[current_pitch+6];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_6 & 0x02){
-    T = PERIODS[current_pitch+7];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_6 & 0x04){
-    T = PERIODS[current_pitch+8];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_6 & 0x08){
-    T = PERIODS[current_pitch+9];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_6 & 0x10){
-    T = PERIODS[current_pitch+10];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_6 & 0x20){
-    T = PERIODS[current_pitch+11];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_12 & 0x01){
-    T = PERIODS[current_pitch+12];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_12 & 0x02){
-    T = PERIODS[current_pitch+13];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_12 & 0x04){
-    T = PERIODS[current_pitch+14];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_12 & 0x08){
-    T = PERIODS[current_pitch+15];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_12 & 0x10){
-    T = PERIODS[current_pitch+16];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_12 & 0x20){
-    T = PERIODS[current_pitch+17];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_18 & 0x01){
-    T = PERIODS[current_pitch+18];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_18 & 0x02){
-    T = PERIODS[current_pitch+19];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_18 & 0x04){
-    T = PERIODS[current_pitch+20];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_18 & 0x08){
-    T = PERIODS[current_pitch+21];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_18 & 0x10){
-    T = PERIODS[current_pitch+22];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_18 & 0x20){
-    T = PERIODS[current_pitch+23];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_24 & 0x01){
-    T = PERIODS[current_pitch+24];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_24 & 0x02){
-    T = PERIODS[current_pitch+25];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_24 & 0x04){
-    T = PERIODS[current_pitch+26];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_24 & 0x08){
-    T = PERIODS[current_pitch+27];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_24 & 0x10){
-    T = PERIODS[current_pitch+28];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_24 & 0x20){
-    T = PERIODS[current_pitch+29];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_30 & 0x01){
-    T = PERIODS[current_pitch+30];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_30 & 0x02){
-    T = PERIODS[current_pitch+31];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_30 & 0x04){
-    T = PERIODS[current_pitch+32];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_30 & 0x08){
-    T = PERIODS[current_pitch+33];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_30 & 0x10){
-    T = PERIODS[current_pitch+34];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  if(keys_30 & 0x20){
-    T = PERIODS[current_pitch+35];
-    if(t%T < ( T >> 1) ){
-      analog_out += NOTE_AMP;
-    }
-  }
-  //Indicating that the analog value is now relevant
-  flag_analog_out_ready=1;
+  //TODO : same thing for all 36 keys
 }
 
 /**
@@ -427,7 +260,7 @@ int main(){
     //Checking keys 0:5 by setting PB0 to 0, a no_operation is required for sync, see datasheet p60
     PORTB &= ~0x01;
     nop();
-    keys_0 = ~((uint8_t)PIND>>2);
+    keys_0 = ~((uint8_t)PIND>>2); //The cast to unsigned is here to make sure it is a logical shift and not arithmetical shift
     PORTB |= 0x01;
     //Checking keys 6:11 by setting PB2 to 0
     PORTB &= ~0x04;
@@ -465,7 +298,6 @@ int main(){
     buttons_settings_2 = ~((uint8_t)PIND>>2);
     PORTC |= 0x04;
 
-    setAnalogOut();
 #ifdef DEBUG
     //TOREMOVE : sets PC5 to high by putting PD2 to GND and to low by putting PD3 to GND
     if(keys_0 & 0x01){
@@ -478,6 +310,17 @@ int main(){
       Serial.print("k2\n");
     }
 #endif
+
+    if(flag_request_update){
+      setAnalogOut();
+      keys_0_last = keys_0;
+      keys_6_last = keys_6;
+      keys_12_last = keys_12;
+      keys_18_last = keys_18;
+      keys_24_last = keys_24;
+      keys_30_last = keys_30;
+      flag_request_update = 0;
+    }
   }
   //Program won't actually go outside this loop
 
