@@ -44,6 +44,19 @@ const uint16_t PERIODS[] = {
   239,   225,   213,   201,   190,   179,   169,   159,   150,   142,   134,   127    //C8 to B8
 };
 
+//MIDI code for each note
+const uint8_t MIDI_NOTES[] = {
+  0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, //C0 to B0
+  0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, //C1 to B1
+  0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, //C2 to B2
+  0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, //C3 to B3
+  0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, //C4 to B4
+  0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, //C5 to B5
+  0x3c, 0x3d, 0x3e, 0x3f, 0x40, 0x41, 0x42, 0x43, //C6 to B6
+  0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, //C7 to B7
+  0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, //C8 to B8
+};
+
 
 
 /**
@@ -92,7 +105,7 @@ volatile uint16_t analog_out = 0;
  * \var flag_request_update
  * \brief a flag to indicate that the analog output value needs to be updated
  */
-volatile uint8_t flag_request_update
+volatile uint8_t flag_request_update;
 
 /**
  * \fn void init_timer_1()
@@ -193,13 +206,14 @@ ISR(TIMER1_OVF_vect){
   flag_request_update = 1;
 }
 
-uint8_t getSquareWave(t, period){
+uint8_t getSquareWave(uint64_t t, uint16_t period){
   if(t%period < (period>>1)){
     //High
     return NOTE_AMP;
   }else{
     //Low
     return 0;
+  }
 }
 
 /**
@@ -215,18 +229,26 @@ void setAnalogOut(){
   uint8_t value_current = 0;
   //Variable to store wave value at last sample
   uint8_t value_last = 0;
+  //Array to store midi message
+  uint8_t midi_msg[3];
 
   //Is first key pressed ?
   if(keys_0 & KEY_0_MSK){
     //If first key pressed, was it pressed last sample ?
     if(keys_0_last & KEY_0_MSK){
       //If was pressed
-      value_current = getSquareWave(t,T);
-      value_last = getSquareWave(t-SAMPLE_TIME,T)
-      analog_out += (value_current-value_last)
+      T = PERIODS[current_pitch_0];
+      value_current = getSquareWave(t, T);
+      value_last = getSquareWave(t-SAMPLE_TIME, T);
+      analog_out += (value_current - value_last);
     }else{
       //Was not pressed last sample, it is a change
-      //TODO: WRITE MIDI NOTEON
+      //Write MIDI event : note on, note, velocity
+      midi_msg[0] = 0x90;
+      midi_msg[1] = MIDI_NOTES[current_pitch_0];
+      midi_msg[2] = 0x40;
+      Serial.write(midi_msg, 3);
+      T = PERIODS[current_pitch_0];
       value_current = getSquareWave(t,T);
       analog_out += value_current;
     }
@@ -234,8 +256,13 @@ void setAnalogOut(){
     //The first key is not pressed, was it pressed last sample ?
     if(keys_0_last & KEY_0_MSK){
       //If was pressed, it is a change
-      //TODO: WRITE MIDI NOTEOFF
-      value_current = getSquareWave(t,T);
+      //Write MIDI event : note off, note, velocity
+      midi_msg[0] = 0x80;
+      midi_msg[1] = MIDI_NOTES[current_pitch_0];
+      midi_msg[2] = 0x40;
+      Serial.write(midi_msg, 3);
+      T = PERIODS[current_pitch_0];
+      value_current = getSquareWave(t, T);
       analog_out -= value_current;
     }
     //Nothing to do if key not pressed and was not pressed
