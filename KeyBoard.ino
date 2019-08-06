@@ -156,16 +156,16 @@ void init_pins(){
   PORTD |= B11111100;
 
   //PWM output OCA1, which is on PB1, aka Pin9
-  //PortB 0 and 2:5 as output for buttons from Keys 0 to 30
+  //PortB 0 and 2:5 as output for buttons from Keys 0 to 23
   //Built-in led also on PB5 as output
   DDRB |= (1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5);
   //Turning on all outputs for now
-  PORTB |= 0x3D;
+  PORTB |= B00011101;
 
-  //PortC 0:2 as output for keys 31 to 36 and buttons settings 1 and 2
-  DDRC |= (1<<DDC0 | 1<<DDC1 | 1<<DDC2);
+  //PortC 0:3 as output for keys 24 to 35 and buttons settings 1 and 2
+  DDRC |= (1<<DDC0 | 1<<DDC1 | 1<<DDC2 | 1<<DDC3);
   //Turning on all outputs for now
-  PORTC |= 0x07;
+  PORTC |= B00001111;
 }
 
 /**
@@ -923,37 +923,37 @@ int main(){
     nop();
     keys_18 = ~((uint8_t)PIND>>2);
     PORTB |= 0x10;
-    //Checking keys 24:29 by setting PB5 to 0
-    PORTB &= ~0x20;
-    nop();
-    keys_24 = ~((uint8_t)PIND>>2);
-    PORTB |= 0x20;
-    //Checking keys 30:35 by setting PC0 to 0
+    //Checking keys 24:29 by setting PC0 to 0
     PORTC &= ~0x01;
     nop();
-    keys_30 = ~((uint8_t)PIND>>2);
+    keys_24 = ~((uint8_t)PIND>>2);
     PORTC |= 0x01;
-    //Checking buttons_settings_1 by setting PC1 to 0
+    //Checking keys 30:35 by setting PC1 to 0
     PORTC &= ~0x02;
     nop();
-    buttons_settings_1 = ~((uint8_t)PIND>>2);
+    keys_30 = ~((uint8_t)PIND>>2);
     PORTC |= 0x02;
-    //Checking buttons_settings_2 by setting PC2 to 0
+    //Checking buttons_settings_1 by setting PC2 to 0
     PORTC &= ~0x04;
     nop();
-    buttons_settings_2 = ~((uint8_t)PIND>>2);
+    buttons_settings_1 = ~((uint8_t)PIND>>2);
     PORTC |= 0x04;
+    //Checking buttons_settings_2 by setting PC3 to 0
+    PORTC &= ~0x08;
+    nop();
+    buttons_settings_2 = ~((uint8_t)PIND>>2);
+    PORTC |= 0x08;
 
 #ifdef DEBUG
-    //TOREMOVE : sets PC5 to high by putting PD2 to GND and to low by putting PD3 to GND
+    //TOREMOVE : sets PB5 to high by putting PD2 to GND and to low by putting PD3 to GND
     if(keys_0 & 0x01){
-      Serial.print("k0\n");
+      PORTB |= 1<<DDB5;
     }
     if(keys_0 & 0x02){
-      Serial.print("k1\n");
+      PORTB &= ~ (1<<DDB5);
     }
     if(keys_0 & 0x04){
-      Serial.print("k2\n");
+      PORTB |= 1<<DDB5;
     }
 #endif
 
