@@ -13,11 +13,9 @@
 #define SAMPLE_FREQUENCY 31250
 //Sample time in micro second
 #define SAMPLE_TIME 32
-//The following macros takes the PIND register as bVVVVVVXX and returns b00VVVVVV since there are pull-ups most bits will be 1 by except with pressed keys which will be 0
-#define PIND_RELEVANT (PIND>>2)
 //The no-operation function as defined in assembly language
 #define nop() __asm__("nop\n\t")
-//The analog amplitude for one note, defining how many notes can be played at once, here 8 notes because 8*32 = 256
+//The analog amplitude for one note, defining how many notes can be played at once, here 8 notes because 8*64 = 512
 #define NOTE_AMP 64
 //Number of notes per octave
 #define OCTAVE 12
@@ -908,7 +906,7 @@ int main(){
     //Checking keys 0:5 by setting PB0 to 0, a no_operation is required for sync, see datasheet p60
     PORTB &= ~0x01;
     nop();
-    keys_0 = ~(PIND); //The cast to unsigned is here to make sure it is a logical shift and not arithmetical shift
+    keys_0 = ~(PIND);
     PORTB |= 0x01;
     //Checking keys 6:11 by setting PB2 to 0
     PORTB &= ~0x04;
