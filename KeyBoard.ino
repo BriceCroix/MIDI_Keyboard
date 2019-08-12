@@ -106,6 +106,12 @@ volatile uint16_t analog_out = 0;
 volatile uint8_t flag_request_update = 0;
 
 /**
+ * \var period_shift_multiplier
+ * \brief a variable that multiplies the frequency, used for pitch shifting.
+ */
+volatile float period_shift_multiplier = 1;
+
+/**
  * \fn void init_timer_1()
  * \brief Sets timer 1 in condition to generate PWM signal
  */
@@ -918,6 +924,11 @@ if(keys_30 & KEY_5_MSK){
  * \brief main function to loop over and over endlessly
  */
 int main(){
+  // A variable to store the ADC value for the pitch shifting
+  uint8_t ADC_pitch_shift;
+  // A variable to store the ADC value for the tremolo
+  uint8_t ADC_tremolo;
+
   //Disable interrupts while initializing, cf p11
   SREG &= ~0x80;
   init_timer_1();
@@ -930,6 +941,10 @@ int main(){
   PORTB |= B00100000;
 
   while(1){
+    //Start ADC conversion for channel 6, volume
+    ADMUX &= ~(1<<MUX0); //ADMUX2:0 = 6
+    ADCSRA |= (1<<ADSC);
+
     //Checking keys 0:5 by setting PB0 to 0, a no_operation is required for sync, see datasheet p60
     PORTB &= ~0x01;
     nop();
@@ -950,6 +965,15 @@ int main(){
     nop();
     keys_18 = ~(PIND);
     PORTB |= 0x10;
+
+    //Recover ADC result for channel 6
+    while(ADCSRA & (1<<ADSC));
+    ADC_tremolo = ADCH;
+
+    //Start ADC conversion for channel 7, pitch shift
+    ADMUX |= (1<<MUX0); //ADMUX2:0 = 7
+    ADCSRA |= (1<<ADSC);
+
     //Checking keys 24:29 by setting PC0 to 0
     PORTC &= ~0x01;
     nop();
@@ -971,6 +995,10 @@ int main(){
     buttons_settings_2 = ~(PIND);
     PORTC |= 0x08;
 
+    //Recover ADC result for channel 7
+    while(ADCSRA & (1<<ADSC));
+    ADC_pitch_shift = ADCH;
+
 #ifdef DEBUG
     //TOREMOVE : sets PB5 to high by putting PD2 to GND and to low by putting PD3 to GND
     if(keys_0 & KEY_0_MSK){
@@ -985,6 +1013,11 @@ int main(){
 #endif
 
     if(flag_request_update){
+      //Update the frequency with its pitch shift
+      //This formula allows for 7 semitones up, more down
+      period_shift_multiplier = ADC_pitch_shift * (-0.002598282) + 1.329981791;
+
+      //Update the actual analog value
       setAnalogOut();
       keys_0_last = keys_0;
       keys_6_last = keys_6;
