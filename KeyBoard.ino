@@ -142,7 +142,7 @@ void init_timer_1(){
 
 /**
  * \fn void init_pins()
- * \brief Sets pinsXXX to input and pinsXXX to output
+ * \brief Sets pins PD7:2 as pulled-up inputs and pins PB5:0, PC3:0 as outputs
  */
 void init_pins(){
   //Enabling pull-ups for all ports
@@ -164,6 +164,32 @@ void init_pins(){
   DDRC |= (1<<DDC0 | 1<<DDC1 | 1<<DDC2 | 1<<DDC3);
   //Turning on all outputs for now
   PORTC |= B00001111;
+}
+
+/**
+ * \fn void init_adc()
+ * \brief Enables the ADC with no ADC clock prescaler
+ */
+void init_adc(){
+  // Reference is AVcc = 5V
+  // Result is left aligned
+  ADMUX = (1<<REFS0) | (1<<ADLAR);
+
+  // ADC Enable and no prescaler
+  // 16000000/64 = 250000
+  ADCSRA |= (1<<ADEN);
+  ADCSRA &= ~((1<<ADPS0) | (1<<ADPS1) | (1<<ADPS2) );
+
+  // For now ADC connected to pin A6
+  ADMUX |= (1<<MUX2)|(1<<MUX1);
+
+  // start single convertion by writing ’1′ to ADSC
+  //Useful since first conversion is longer
+  //This bit will be ON until conversion is done
+  ADCSRA |= (1<<ADSC);
+  while(ADCSRA & (1<<ADSC));
+
+  //Result will be readable in ADCH
 }
 
 /**
@@ -896,6 +922,7 @@ int main(){
   SREG &= ~0x80;
   init_timer_1();
   init_pins();
+  init_adc();
   //init_serial();
   //Enable interrupts
   SREG |= 0x80;
