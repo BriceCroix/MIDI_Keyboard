@@ -9,19 +9,19 @@
 #include <avr/io.h>
 #include "binary.h"
 
-//Sample frequency in Hz
+// Sample frequency in Hz
 #define SAMPLE_FREQUENCY 31250
-//Sample time in micro second
+// Sample time in micro second
 #define SAMPLE_TIME 32
-//The no-operation function as defined in assembly language
+// The no-operation function as defined in assembly language
 #define nop() __asm__("nop\n\t")
-//The analog amplitude for one note, defining how many notes can be played at once, here 8 notes because 8*64 = 512
+// The analog amplitude for one note, defining how many notes can be played at once, here 8 notes because 8*64 = 512
 #define NOTE_AMP 64
-//Number of notes per octave
+// Number of notes per octave
 #define OCTAVE 12
-//Minimum duty value for analog output, notice NOTE_AMP/2
+// Minimum duty value for analog output, notice NOTE_AMP/2
 #define PWM_MIN 32
-//Masks to check keys level in a key group
+// Masks to check keys level in a key group
 #define KEY_0_MSK 0x04
 #define KEY_1_MSK 0x08
 #define KEY_2_MSK 0x10
@@ -29,7 +29,10 @@
 #define KEY_4_MSK 0x40
 #define KEY_5_MSK 0x80
 
-//Each period in us from C0 to B8
+/**
+ * \var PERIODS
+ * \brief Each period in us from C0 to B8
+ */
 const uint16_t PERIODS[] = {
   61156, 57724, 54484, 51426, 48540, 45815, 43244, 40817, 38526, 36364, 34323, 32396, //C0 to B0
   30578, 28862, 27242, 25713, 24270, 22908, 21622, 20408, 19263, 18182, 17161, 16198, //C1 to B1
@@ -42,7 +45,10 @@ const uint16_t PERIODS[] = {
   239,   225,   213,   201,   190,   179,   169,   159,   150,   142,   134,   127    //C8 to B8
 };
 
-//MIDI code for each note
+/**
+ * \var MIDI_NOTES
+ * \brief MIDI code for each note
+ */
 const uint8_t MIDI_NOTES[] = {
   0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, //C0 to B0
   0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, //C1 to B1
@@ -149,7 +155,7 @@ void init_timer_1(){
    saturate above 7 simultaneous notes*/
   OCR1A = PWM_MIN;
 
-  //N.B. OC1A (channel A) output is on pin 9 and OC1B on pin 10
+  // N.B. OC1A (channel A) output is on pin 9 and OC1B on pin 10
 }
 
 /**
@@ -157,24 +163,24 @@ void init_timer_1(){
  * \brief Sets pins PD7:2 as pulled-up inputs and pins PB5:0, PC3:0 as outputs
  */
 void init_pins(){
-  //Enabling pull-ups for all ports
+  // Enabling pull-ups for all ports
   MCUCR &= ~0x10;
 
-  //PortD 2:7 as input for all buttons, this will allow to get all values in one instruction
+  // PortD 2:7 as input for all buttons, this will allow to get all values in one instruction
   DDRD &= ~(1<<DDD2 | 1<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7);
-  //Put pins PD2:7 to pull-up
+  // Put pins PD2:7 to pull-up
   PORTD |= B11111100;
 
-  //PWM output OCA1, which is on PB1, aka Pin9
-  //PortB 0 and 2:5 as output for buttons from Keys 0 to 23
-  //Built-in led also on PB5 as output
+  // PWM output OCA1, which is on PB1, aka Pin9
+  // PortB 0 and 2:5 as output for buttons from Keys 0 to 23
+  // Built-in led also on PB5 as output
   DDRB |= (1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5);
-  //Turning on all outputs for now
+  // Turning on all outputs for now
   PORTB |= B00011101;
 
-  //PortC 0:3 as output for keys 24 to 35 and buttons settings 1 and 2
+  // PortC 0:3 as output for keys 24 to 35 and buttons settings 1 and 2
   DDRC |= (1<<DDC0 | 1<<DDC1 | 1<<DDC2 | 1<<DDC3);
-  //Turning on all outputs for now
+  // Turning on all outputs for now
   PORTC |= B00001111;
 }
 
@@ -196,12 +202,12 @@ void init_adc(){
   ADMUX |= (1<<MUX2)|(1<<MUX1);
 
   // start single convertion by writing ’1′ to ADSC
-  //Useful since first conversion is longer
-  //This bit will be ON until conversion is done
+  // Useful since first conversion is longer
+  // This bit will be ON until conversion is done
   ADCSRA |= (1<<ADSC);
   while(ADCSRA & (1<<ADSC));
 
-  //Result will be readable in ADCH
+  // Result will be readable in ADCH
 }
 
 /**
@@ -209,15 +215,15 @@ void init_adc(){
  * \brief initialize the serial peripheral interface
  */
 void init_serial(){
-  //Enable SPI
+  // Enable SPI
   SPCR |= 0x40;
-  //Disable SPI interrupts
+  // Disable SPI interrupts
   SPCR &= ~0x80;
-  //LSB first
+  // LSB first
   SPCR |= 0x20;
-  //Master mode
+  // Master mode
   SPCR |= 0x10;
-  //Baud rate
+  // Baud rate
   Serial.begin(9600);
 }
 /**
@@ -234,11 +240,11 @@ void disable_ide_stuff(){
  * \brief interruption code when an ovf occurs on timer 1
  */
 ISR(TIMER1_OVF_vect){
-  //Let us update time
+  // Let us update time
   t += SAMPLE_TIME;
-  //Let us update the analog pin output value
+  // Let us update the analog pin output value
   OCR1A = analog_out;
-  //Request an output update
+  // Request an output update
   flag_request_update = 1;
 }
 
@@ -459,78 +465,78 @@ int main(){
   // A variable to store the ADC value for the tremolo
   uint8_t ADC_tremolo;
 
-  //Disable interrupts while initializing, cf p11
+  // Disable interrupts while initializing, cf p11
   SREG &= ~0x80;
   init_timer_1();
   init_pins();
   init_adc();
-  //init_serial();
-  //Enable interrupts
+  // init_serial();
+  // Enable interrupts
   SREG |= 0x80;
 
   PORTB |= B00100000;
 
   while(1){
-    //Start ADC conversion for channel 6, volume
+    // Start ADC conversion for channel 6, volume
     ADMUX &= ~(1<<MUX0); //ADMUX2:0 = 6
     ADCSRA |= (1<<ADSC);
 
-    //Checking keys 0:5 by setting PB0 to 0, a no_operation is required for sync, see datasheet p60
+    // Checking keys 0:5 by setting PB0 to 0, a no_operation is required for sync, see datasheet p60
     PORTB &= ~0x01;
     nop();
     keys_0 = ~(PIND);
     PORTB |= 0x01;
-    //Checking keys 6:11 by setting PB2 to 0
+    // Checking keys 6:11 by setting PB2 to 0
     PORTB &= ~0x04;
     nop();
     keys_6 = ~(PIND);
     PORTB |= 0x04;
-    //Checking keys 12:17 by setting PB3 to 0
+    // Checking keys 12:17 by setting PB3 to 0
     PORTB &= ~0x08;
     nop();
     keys_12 = ~(PIND);
     PORTB |= 0x08;
-    //Checking keys 18:23 by setting PB4 to 0
+    // Checking keys 18:23 by setting PB4 to 0
     PORTB &= ~0x10;
     nop();
     keys_18 = ~(PIND);
     PORTB |= 0x10;
 
-    //Recover ADC result for channel 6
+    // Recover ADC result for channel 6
     while(ADCSRA & (1<<ADSC));
     ADC_tremolo = ADCH;
 
-    //Start ADC conversion for channel 7, pitch shift
+    // Start ADC conversion for channel 7, pitch shift
     ADMUX |= (1<<MUX0); //ADMUX2:0 = 7
     ADCSRA |= (1<<ADSC);
 
-    //Checking keys 24:29 by setting PC0 to 0
+    // Checking keys 24:29 by setting PC0 to 0
     PORTC &= ~0x01;
     nop();
     keys_24 = ~(PIND);
     PORTC |= 0x01;
-    //Checking keys 30:35 by setting PC1 to 0
+    // Checking keys 30:35 by setting PC1 to 0
     PORTC &= ~0x02;
     nop();
     keys_30 = ~(PIND);
     PORTC |= 0x02;
-    //Checking buttons_settings_1 by setting PC2 to 0
+    // Checking buttons_settings_1 by setting PC2 to 0
     PORTC &= ~0x04;
     nop();
     buttons_settings_1 = ~(PIND);
     PORTC |= 0x04;
-    //Checking buttons_settings_2 by setting PC3 to 0
+    // Checking buttons_settings_2 by setting PC3 to 0
     PORTC &= ~0x08;
     nop();
     buttons_settings_2 = ~(PIND);
     PORTC |= 0x08;
 
-    //Recover ADC result for channel 7
+    // Recover ADC result for channel 7
     while(ADCSRA & (1<<ADSC));
     ADC_pitch_shift = ADCH;
 
 #ifdef DEBUG
-    //TOREMOVE : sets PB5 to high by putting PD2 to GND and to low by putting PD3 to GND
+    // TOREMOVE : sets PB5 to high by putting PD2 to GND and to low by putting PD3 to GND
     if(keys_0 & KEY_0_MSK){
       PORTB |= 1<<DDB5;
     }
@@ -543,19 +549,20 @@ int main(){
 #endif
 
     if(flag_request_update){
-      //Update the frequency with its pitch shift
-      //This formula allows for 7 semitones up, more down
+      // Update the frequency with its pitch shift
+      // This formula allows for 7 semitones up, more down
       period_shift_multiplier = ADC_pitch_shift * (-0.002598282) + 1.329981791;
 
       // Update the velocity multiplier
       // This formula allows for nulling or doubling the velocity (number is 1/127)
       velocity_multiplier = ADC_tremolo * 0.007874016;
+
       // Update the actual analog value
       setAnalogOut();
       flag_request_update = 0;
     }
   }
-  //Program won't actually go outside this loop
+  // Program won't actually go outside this loop
 
   return EXIT_FAILURE;
 }
