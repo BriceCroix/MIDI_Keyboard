@@ -255,668 +255,192 @@ void setAnalogOut(){
   uint8_t current_pitch_0 = pitch_0;
   //Variable to store current considered period
   uint16_t T;
-  //Variable to temporarily store wave value at given time
-  uint8_t value_current = 0;
-  //Variable to store wave value at last sample
-  uint8_t value_last = 0;
+  // Variable to temporarily store analog out
+  uint16_t analog_out_temp = PWM_MIN;
 
-  // Is first key pressed ?
+  // Is key 0 pressed ?
   if(keys_0 & KEY_0_MSK){
-    // If first key pressed, was it pressed last sample ?
-    if(keys_0_last & KEY_0_MSK){
-      // If was pressed
-      T = PERIODS[current_pitch_0];
-      value_current = getSquareWave(t, T);
-      value_last = getSquareWave(t-SAMPLE_TIME, T);
-      analog_out += (value_current - value_last);
-    }else{
-      // Was not pressed last sample, it is a change
-      T = PERIODS[current_pitch_0];
-      value_current = getSquareWave(t,T);
-      analog_out += value_current;
-    }
-  }else{
-    // The first key is not pressed, was it pressed last sample ?
-    if(keys_0_last & KEY_0_MSK){
-      // If was pressed, it is a change
-      T = PERIODS[current_pitch_0];
-      value_current = getSquareWave(t, T);
-      analog_out -= value_current;
-    }
-    // Nothing to do if key not pressed and was not pressed
+  T = PERIODS[current_pitch_0 + 0] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
   }
-  // Same thing for all 36 keys :
+  // Is key 1 pressed ?
   if(keys_0 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 1];
-  if(keys_0_last & KEY_1_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
+  T = PERIODS[current_pitch_0 + 1] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
   }
-}else{
-  if(keys_0_last & KEY_1_MSK){
-    T = PERIODS[current_pitch_0 + 1];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
+  // Is key 2 pressed ?
+  if(keys_0 & KEY_2_MSK){
+  T = PERIODS[current_pitch_0 + 2] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
   }
-}
+  // Is key 3 pressed ?
+  if(keys_0 & KEY_3_MSK){
+  T = PERIODS[current_pitch_0 + 3] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 4 pressed ?
+  if(keys_0 & KEY_4_MSK){
+  T = PERIODS[current_pitch_0 + 4] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 5 pressed ?
+  if(keys_0 & KEY_5_MSK){
+  T = PERIODS[current_pitch_0 + 5] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 6 pressed ?
+  if(keys_6 & KEY_0_MSK){
+  T = PERIODS[current_pitch_0 + 6] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 7 pressed ?
+  if(keys_6 & KEY_1_MSK){
+  T = PERIODS[current_pitch_0 + 7] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 8 pressed ?
+  if(keys_6 & KEY_2_MSK){
+  T = PERIODS[current_pitch_0 + 8] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 9 pressed ?
+  if(keys_6 & KEY_3_MSK){
+  T = PERIODS[current_pitch_0 + 9] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 10 pressed ?
+  if(keys_6 & KEY_4_MSK){
+  T = PERIODS[current_pitch_0 + 10] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 11 pressed ?
+  if(keys_6 & KEY_5_MSK){
+  T = PERIODS[current_pitch_0 + 11] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 12 pressed ?
+  if(keys_12 & KEY_0_MSK){
+  T = PERIODS[current_pitch_0 + 12] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 13 pressed ?
+  if(keys_12 & KEY_1_MSK){
+  T = PERIODS[current_pitch_0 + 13] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 14 pressed ?
+  if(keys_12 & KEY_2_MSK){
+  T = PERIODS[current_pitch_0 + 14] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 15 pressed ?
+  if(keys_12 & KEY_3_MSK){
+  T = PERIODS[current_pitch_0 + 15] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 16 pressed ?
+  if(keys_12 & KEY_4_MSK){
+  T = PERIODS[current_pitch_0 + 16] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 17 pressed ?
+  if(keys_12 & KEY_5_MSK){
+  T = PERIODS[current_pitch_0 + 17] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 18 pressed ?
+  if(keys_18 & KEY_0_MSK){
+  T = PERIODS[current_pitch_0 + 18] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 19 pressed ?
+  if(keys_18 & KEY_1_MSK){
+  T = PERIODS[current_pitch_0 + 19] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 20 pressed ?
+  if(keys_18 & KEY_2_MSK){
+  T = PERIODS[current_pitch_0 + 20] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 21 pressed ?
+  if(keys_18 & KEY_3_MSK){
+  T = PERIODS[current_pitch_0 + 21] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 22 pressed ?
+  if(keys_18 & KEY_4_MSK){
+  T = PERIODS[current_pitch_0 + 22] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 23 pressed ?
+  if(keys_18 & KEY_5_MSK){
+  T = PERIODS[current_pitch_0 + 23] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 24 pressed ?
+  if(keys_24 & KEY_0_MSK){
+  T = PERIODS[current_pitch_0 + 24] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 25 pressed ?
+  if(keys_24 & KEY_1_MSK){
+  T = PERIODS[current_pitch_0 + 25] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 26 pressed ?
+  if(keys_24 & KEY_2_MSK){
+  T = PERIODS[current_pitch_0 + 26] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 27 pressed ?
+  if(keys_24 & KEY_3_MSK){
+  T = PERIODS[current_pitch_0 + 27] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 28 pressed ?
+  if(keys_24 & KEY_4_MSK){
+  T = PERIODS[current_pitch_0 + 28] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 29 pressed ?
+  if(keys_24 & KEY_5_MSK){
+  T = PERIODS[current_pitch_0 + 29] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 30 pressed ?
+  if(keys_30 & KEY_0_MSK){
+  T = PERIODS[current_pitch_0 + 30] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 31 pressed ?
+  if(keys_30 & KEY_1_MSK){
+  T = PERIODS[current_pitch_0 + 31] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 32 pressed ?
+  if(keys_30 & KEY_2_MSK){
+  T = PERIODS[current_pitch_0 + 32] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 33 pressed ?
+  if(keys_30 & KEY_3_MSK){
+  T = PERIODS[current_pitch_0 + 33] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 34 pressed ?
+  if(keys_30 & KEY_4_MSK){
+  T = PERIODS[current_pitch_0 + 34] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
+  // Is key 35 pressed ?
+  if(keys_30 & KEY_5_MSK){
+  T = PERIODS[current_pitch_0 + 35] * period_shift_multiplier;
+  analog_out_temp += getSquareWave(t, T);
+  }
 
-if(keys_0 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 2];
-  if(keys_0_last & KEY_2_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_0_last & KEY_2_MSK){
-    T = PERIODS[current_pitch_0 + 2];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_0 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 3];
-  if(keys_0_last & KEY_3_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_0_last & KEY_3_MSK){
-    T = PERIODS[current_pitch_0 + 3];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_0 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 4];
-  if(keys_0_last & KEY_4_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_0_last & KEY_4_MSK){
-    T = PERIODS[current_pitch_0 + 4];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_0 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 5];
-  if(keys_0_last & KEY_5_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_0_last & KEY_5_MSK){
-    T = PERIODS[current_pitch_0 + 5];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_6 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 6];
-  if(keys_6_last & KEY_0_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_6_last & KEY_0_MSK){
-    T = PERIODS[current_pitch_0 + 6];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_6 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 7];
-  if(keys_6_last & KEY_1_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_6_last & KEY_1_MSK){
-    T = PERIODS[current_pitch_0 + 7];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_6 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 8];
-  if(keys_6_last & KEY_2_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_6_last & KEY_2_MSK){
-    T = PERIODS[current_pitch_0 + 8];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_6 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 9];
-  if(keys_6_last & KEY_3_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_6_last & KEY_3_MSK){
-    T = PERIODS[current_pitch_0 + 9];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_6 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 10];
-  if(keys_6_last & KEY_4_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_6_last & KEY_4_MSK){
-    T = PERIODS[current_pitch_0 + 10];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_6 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 11];
-  if(keys_6_last & KEY_5_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_6_last & KEY_5_MSK){
-    T = PERIODS[current_pitch_0 + 11];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_12 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 12];
-  if(keys_12_last & KEY_0_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_12_last & KEY_0_MSK){
-    T = PERIODS[current_pitch_0 + 12];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_12 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 13];
-  if(keys_12_last & KEY_1_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_12_last & KEY_1_MSK){
-    T = PERIODS[current_pitch_0 + 13];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_12 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 14];
-  if(keys_12_last & KEY_2_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_12_last & KEY_2_MSK){
-    T = PERIODS[current_pitch_0 + 14];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_12 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 15];
-  if(keys_12_last & KEY_3_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_12_last & KEY_3_MSK){
-    T = PERIODS[current_pitch_0 + 15];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_12 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 16];
-  if(keys_12_last & KEY_4_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_12_last & KEY_4_MSK){
-    T = PERIODS[current_pitch_0 + 16];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_12 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 17];
-  if(keys_12_last & KEY_5_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_12_last & KEY_5_MSK){
-    T = PERIODS[current_pitch_0 + 17];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_18 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 18];
-  if(keys_18_last & KEY_0_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_18_last & KEY_0_MSK){
-    T = PERIODS[current_pitch_0 + 18];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_18 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 19];
-  if(keys_18_last & KEY_1_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_18_last & KEY_1_MSK){
-    T = PERIODS[current_pitch_0 + 19];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_18 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 20];
-  if(keys_18_last & KEY_2_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_18_last & KEY_2_MSK){
-    T = PERIODS[current_pitch_0 + 20];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_18 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 21];
-  if(keys_18_last & KEY_3_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_18_last & KEY_3_MSK){
-    T = PERIODS[current_pitch_0 + 21];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_18 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 22];
-  if(keys_18_last & KEY_4_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_18_last & KEY_4_MSK){
-    T = PERIODS[current_pitch_0 + 22];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_18 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 23];
-  if(keys_18_last & KEY_5_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_18_last & KEY_5_MSK){
-    T = PERIODS[current_pitch_0 + 23];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_24 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 24];
-  if(keys_24_last & KEY_0_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_24_last & KEY_0_MSK){
-    T = PERIODS[current_pitch_0 + 24];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_24 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 25];
-  if(keys_24_last & KEY_1_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_24_last & KEY_1_MSK){
-    T = PERIODS[current_pitch_0 + 25];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_24 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 26];
-  if(keys_24_last & KEY_2_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_24_last & KEY_2_MSK){
-    T = PERIODS[current_pitch_0 + 26];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_24 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 27];
-  if(keys_24_last & KEY_3_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_24_last & KEY_3_MSK){
-    T = PERIODS[current_pitch_0 + 27];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_24 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 28];
-  if(keys_24_last & KEY_4_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_24_last & KEY_4_MSK){
-    T = PERIODS[current_pitch_0 + 28];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_24 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 29];
-  if(keys_24_last & KEY_5_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_24_last & KEY_5_MSK){
-    T = PERIODS[current_pitch_0 + 29];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_30 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 30];
-  if(keys_30_last & KEY_0_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_30_last & KEY_0_MSK){
-    T = PERIODS[current_pitch_0 + 30];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_30 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 31];
-  if(keys_30_last & KEY_1_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_30_last & KEY_1_MSK){
-    T = PERIODS[current_pitch_0 + 31];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_30 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 32];
-  if(keys_30_last & KEY_2_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_30_last & KEY_2_MSK){
-    T = PERIODS[current_pitch_0 + 32];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_30 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 33];
-  if(keys_30_last & KEY_3_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_30_last & KEY_3_MSK){
-    T = PERIODS[current_pitch_0 + 33];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_30 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 34];
-  if(keys_30_last & KEY_4_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_30_last & KEY_4_MSK){
-    T = PERIODS[current_pitch_0 + 34];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-if(keys_30 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 35];
-  if(keys_30_last & KEY_5_MSK){
-    value_current = getSquareWave(t, T);
-    value_last = getSquareWave(t-SAMPLE_TIME, T);
-    analog_out += (value_current - value_last);
-  }else{
-    value_current = getSquareWave(t,T);
-    analog_out += value_current;
-  }
-}else{
-  if(keys_30_last & KEY_5_MSK){
-    T = PERIODS[current_pitch_0 + 35];
-    value_current = getSquareWave(t, T);
-    analog_out -= value_current;
-  }
-}
-
-
+  // Actually update the analog value
+  analog_out = analog_out_temp;
 }
 
 /**
@@ -1019,12 +543,6 @@ int main(){
 
       //Update the actual analog value
       setAnalogOut();
-      keys_0_last = keys_0;
-      keys_6_last = keys_6;
-      keys_12_last = keys_12;
-      keys_18_last = keys_18;
-      keys_24_last = keys_24;
-      keys_30_last = keys_30;
       flag_request_update = 0;
     }
   }
