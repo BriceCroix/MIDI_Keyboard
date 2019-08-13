@@ -112,29 +112,35 @@ volatile uint8_t flag_request_update = 0;
 volatile float period_shift_multiplier = 1;
 
 /**
+ * \var velocity_multiplier
+ * \brief a variable that multiplies the velocity, used for tremolo.
+ */
+volatile float velocity_multiplier = 1;
+
+/**
  * \fn void init_timer_1()
  * \brief Sets timer 1 in condition to generate PWM signal
  */
 void init_timer_1(){
-  //Enable timer1 with no prescaler, cf doc p110
-  TCCR1B &= ~0x07; //Clears bits CS10:12 that handle timer activation
-  TCCR1B |= (1<<CS10); //The timer is supposed to count at 16 Mhz, an external precision clock could be used if necessary
+  // Enable timer1 with no prescaler, cf doc p110
+  TCCR1B &= ~0x07; // Clears bits CS10:12 that handle timer activation
+  TCCR1B |= (1<<CS10); // The timer is supposed to count at 16 Mhz, an external precision clock could be used if necessary
 
-  //Reset counter value
+  // Reset counter value
   TCNT1 = 0;
 
-  //Enable only OVF interrupts, cf doc p112
+  // Enable only OVF interrupts, cf doc p112
   TIMSK1 = 0;
   TIMSK1 |= 0x01;
 
-  //Timer 1 in fast PWM mode, cf p108, WGM13:10 = 1110
-  TCCR1A &= ~0x03; //Clear bits WGM10:11
-  TCCR1A |= 1<<WGM11; //Set WGM11 to 1
-  TCCR1B |= 1<<WGM13 | 1<<WGM12; //Set WGM13:12 to 1
-  //In this mode the Auto-Reload value (TOP, or ARR for a STM32) is in the Input Capture Register
-  ICR1 = 0x01FF; //Sampling Frequency = 31250 Hz with 9 bits resolution
+  // Timer 1 in fast PWM mode, cf p108, WGM13:10 = 1110
+  TCCR1A &= ~0x03; // Clear bits WGM10:11
+  TCCR1A |= 1<<WGM11; // Set WGM11 to 1
+  TCCR1B |= 1<<WGM13 | 1<<WGM12; // Set WGM13:12 to 1
+  // In this mode the Auto-Reload value (TOP, or ARR for a STM32) is in the Input Capture Register
+  ICR1 = 0x01FF; // Sampling Frequency = 31250 Hz with 9 bits resolution
 
-  //Connect OC1A to pin PB1 in non-inverting PWM mode, cf p108
+  // Connect OC1A to pin PB1 in non-inverting PWM mode, cf p108
   TCCR1A &= ~0xF0;
   TCCR1A |= 1<<COM1A1;
 
@@ -239,7 +245,7 @@ ISR(TIMER1_OVF_vect){
 uint8_t getSquareWave(uint64_t t, uint16_t period){
   if(t%period < (period>>1)){
     //High
-    return NOTE_AMP;
+    return (NOTE_AMP * velocity_multiplier);
   }else{
     //Low
     return 0;
@@ -541,7 +547,10 @@ int main(){
       //This formula allows for 7 semitones up, more down
       period_shift_multiplier = ADC_pitch_shift * (-0.002598282) + 1.329981791;
 
-      //Update the actual analog value
+      // Update the velocity multiplier
+      // This formula allows for nulling or doubling the velocity (number is 1/127)
+      velocity_multiplier = ADC_tremolo * 0.007874016;
+      // Update the actual analog value
       setAnalogOut();
       flag_request_update = 0;
     }
