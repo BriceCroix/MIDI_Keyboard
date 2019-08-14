@@ -191,10 +191,7 @@ void init_pins(){
    ADCSRA |= (1<<ADEN);
    // Prescaler of 64, ADC_CLK = 250kHz
    ADCSRA &= ~((1<<ADPS0) | (1<<ADPS1) | (1<<ADPS2) );
-   ADCSRA |= (1<<ADPS2)|(1<<ADPS1);
-
-   //Interrupt enable
-   ADCSRA |= (1<<ADIE);
+   ADCSRA |= (1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 
    // For now ADC connected to pin A7
    ADMUX |= (1<<MUX2)|(1<<MUX1)|(1<<MUX0);
@@ -231,26 +228,6 @@ void init_serial(){
 void disable_ide_stuff(){
   //TODO
   //Disable timer_0, which interrupts to provide delay and millis functions
-}
-
-/**
- * \fn ISR(ADC_vect)
- * \brief interruption code for the ADC end of conversion
- */
-ISR(ADC_vect){
-  // What was the selected channel ?
-  if(ADMUX & (1<<MUX0)){
-    //Channel 7
-    ADC_vibrato = ADCH;
-  }else{
-    //Channel 6
-    ADC_tremolo = ADCH;
-  }
-  //Change channel
-  ADMUX = ADMUX ^ (1<<MUX0);
-
-  //Start new converion
-  ADCSRA |= (1<<ADSC);
 }
 
 /**
@@ -503,6 +480,24 @@ int main(){
   ADCSRA |= (1<<ADSC);
 
   while(1){
+    // Recover value from vibrato and tremolo pots
+    // If no ADC conversion is running
+    if( !(ADCSRA & (1<<ADSC)) ){
+      // What was the selected channel ?
+      if(ADMUX & (1<<MUX0)){
+        //Channel 7
+        ADC_vibrato = ADCH;
+      }else{
+        //Channel 6
+        ADC_tremolo = ADCH;
+      }
+      //Change channel
+      ADMUX = ADMUX ^ (1<<MUX0);
+
+      //Start new converion
+      ADCSRA |= (1<<ADSC);
+    }
+
     // Checking keys 0:5 by setting PB0 to 0, a no_operation is required for sync, see datasheet p60
     PORTB &= ~0x01;
     nop();
