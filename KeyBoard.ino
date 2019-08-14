@@ -91,7 +91,7 @@ volatile uint8_t keys_30_last;
  * \var pitch_0
  * \brief index of the lowest key, 0 for C0, 2 for D0, 12 for C1...
  */
-uint8_t pitch_0 = 24;
+uint8_t pitch_0 = 60;
 
 /**
  * \var t
@@ -106,22 +106,16 @@ volatile uint64_t t = 0;
 volatile uint16_t analog_out = 0;
 
 /**
- * \var flag_request_update
- * \brief a flag to indicate that the analog output value needs to be updated
+ * \var ADC_vibrato
+ * \brief Stores the value of the vibrato potentiometer
  */
-volatile uint8_t flag_request_update = 0;
+volatile uint8_t ADC_vibrato = 127;
 
 /**
- * \var period_shift_multiplier
- * \brief a variable that multiplies the frequency, used for pitch shifting.
+ * \var ADC_tremolo
+ * \brief Stores the value of the tremolo potentiometer
  */
-volatile float period_shift_multiplier = 1;
-
-/**
- * \var velocity_multiplier
- * \brief a variable that multiplies the velocity, used for tremolo.
- */
-volatile float velocity_multiplier = 1;
+volatile uint8_t ADC_tremolo = 127;
 
 /**
  * \fn void init_timer_1()
@@ -188,27 +182,31 @@ void init_pins(){
  * \fn void init_adc()
  * \brief Enables the ADC with no ADC clock prescaler
  */
-void init_adc(){
-  // Reference is AVcc = 5V
-  // Result is left aligned
-  ADMUX = (1<<REFS0) | (1<<ADLAR);
+ void init_adc(){
+   // Reference is AVcc = 5V
+   // Result is left aligned
+   ADMUX = (1<<REFS0) | (1<<ADLAR);
 
-  // ADC Enable and no prescaler
-  // 16000000/64 = 250000
-  ADCSRA |= (1<<ADEN);
-  ADCSRA &= ~((1<<ADPS0) | (1<<ADPS1) | (1<<ADPS2) );
+   // ADC Enable
+   ADCSRA |= (1<<ADEN);
+   // Prescaler of 64, ADC_CLK = 250kHz
+   ADCSRA &= ~((1<<ADPS0) | (1<<ADPS1) | (1<<ADPS2) );
+   ADCSRA |= (1<<ADPS2)|(1<<ADPS1);
 
-  // For now ADC connected to pin A6
-  ADMUX |= (1<<MUX2)|(1<<MUX1);
+   //Interrupt enable
+   ADCSRA |= (1<<ADIE);
 
-  // start single convertion by writing ’1′ to ADSC
-  // Useful since first conversion is longer
-  // This bit will be ON until conversion is done
-  ADCSRA |= (1<<ADSC);
-  while(ADCSRA & (1<<ADSC));
+   // For now ADC connected to pin A7
+   ADMUX |= (1<<MUX2)|(1<<MUX1)|(1<<MUX0);
 
-  // Result will be readable in ADCH
-}
+   // start single conversion by writing ’1′ to ADSC
+   //Useful since first conversion is longer
+   //This bit will be ON untill conversion is done
+   ADCSRA |= (1<<ADSC);
+   while(ADCSRA & (1<<ADSC) );
+
+   //Result will be readable in ADCH
+ }
 
 /**
  * \fn init_serial()
@@ -236,22 +234,44 @@ void disable_ide_stuff(){
 }
 
 /**
+ * \fn ISR(ADC_vect)
+ * \brief interruption code for the ADC end of conversion
+ */
+ISR(ADC_vect){
+  // What was the selected channel ?
+  if(ADMUX & (1<<MUX0)){
+    //Channel 7
+    ADC_vibrato = ADCH;
+  }else{
+    //Channel 6
+    ADC_tremolo = ADCH;
+  }
+  //Change channel
+  ADMUX = ADMUX ^ (1<<MUX0);
+
+  //Start new converion
+  ADCSRA |= (1<<ADSC);
+}
+
+/**
  * \fn ISR(TIMER1_OVF_vect)
  * \brief interruption code when an ovf occurs on timer 1
  */
 ISR(TIMER1_OVF_vect){
-  // Let us update time
-  t += SAMPLE_TIME;
   // Let us update the analog pin output value
   OCR1A = analog_out;
-  // Request an output update
-  flag_request_update = 1;
+
+  // Let us update time
+  t += SAMPLE_TIME;
+
+  // Update analog value for next sample
+  setAnalogOut();
 }
 
-uint8_t getSquareWave(uint64_t t, uint16_t period){
+uint8_t getSquareWave(uint16_t period, float tremolo_multiplier){
   if(t%period < (period>>1)){
     //High
-    return (NOTE_AMP * velocity_multiplier);
+    return (NOTE_AMP * tremolo_multiplier);
   }else{
     //Low
     return 0;
@@ -270,185 +290,193 @@ void setAnalogOut(){
   // Variable to temporarily store analog out
   uint16_t analog_out_temp = PWM_MIN;
 
+  // Update the frequency with its pitch shift
+  // This formula allows for 7 semitones up, more down
+  float vibrato_T_multiplier = ADC_vibrato * (-0.002598282) + 1.329981791;
+
+  // Update the velocity multiplier
+  // This formula allows for nulling or doubling the velocity (number is 1/127)
+  float tremolo_multiplier = ADC_tremolo * 0.007874016;
+
   // Is key 0 pressed ?
   if(keys_0 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 0] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 0] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 1 pressed ?
   if(keys_0 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 1] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 1] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 2 pressed ?
   if(keys_0 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 2] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 2] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 3 pressed ?
   if(keys_0 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 3] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 3] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 4 pressed ?
   if(keys_0 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 4] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 4] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 5 pressed ?
   if(keys_0 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 5] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 5] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 6 pressed ?
   if(keys_6 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 6] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 6] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 7 pressed ?
   if(keys_6 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 7] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 7] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 8 pressed ?
   if(keys_6 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 8] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 8] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 9 pressed ?
   if(keys_6 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 9] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 9] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 10 pressed ?
   if(keys_6 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 10] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 10] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 11 pressed ?
   if(keys_6 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 11] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 11] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 12 pressed ?
   if(keys_12 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 12] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 12] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 13 pressed ?
   if(keys_12 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 13] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 13] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 14 pressed ?
   if(keys_12 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 14] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 14] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 15 pressed ?
   if(keys_12 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 15] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 15] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 16 pressed ?
   if(keys_12 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 16] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 16] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 17 pressed ?
   if(keys_12 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 17] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 17] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 18 pressed ?
   if(keys_18 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 18] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 18] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 19 pressed ?
   if(keys_18 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 19] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 19] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 20 pressed ?
   if(keys_18 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 20] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 20] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 21 pressed ?
   if(keys_18 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 21] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 21] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 22 pressed ?
   if(keys_18 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 22] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 22] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 23 pressed ?
   if(keys_18 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 23] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 23] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 24 pressed ?
   if(keys_24 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 24] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 24] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 25 pressed ?
   if(keys_24 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 25] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 25] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 26 pressed ?
   if(keys_24 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 26] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 26] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 27 pressed ?
   if(keys_24 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 27] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 27] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 28 pressed ?
   if(keys_24 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 28] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 28] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 29 pressed ?
   if(keys_24 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 29] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 29] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 30 pressed ?
   if(keys_30 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 30] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 30] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 31 pressed ?
   if(keys_30 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 31] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 31] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 32 pressed ?
   if(keys_30 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 32] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 32] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 33 pressed ?
   if(keys_30 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 33] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 33] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 34 pressed ?
   if(keys_30 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 34] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 34] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
   // Is key 35 pressed ?
   if(keys_30 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 35] * period_shift_multiplier;
-  analog_out_temp += getSquareWave(t, T);
+  T = PERIODS[current_pitch_0 + 35] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
 
   // Actually update the analog value
@@ -460,27 +488,21 @@ void setAnalogOut(){
  * \brief main function to loop over and over endlessly
  */
 int main(){
-  // A variable to store the ADC value for the pitch shifting
-  uint8_t ADC_pitch_shift;
-  // A variable to store the ADC value for the tremolo
-  uint8_t ADC_tremolo;
-
   // Disable interrupts while initializing, cf p11
   SREG &= ~0x80;
   init_timer_1();
   init_pins();
   init_adc();
-  // init_serial();
+  //init_serial();
   // Enable interrupts
   SREG |= 0x80;
 
-  PORTB |= B00100000;
+  PORTB &= ~(1<<DDB5);
+
+  //Start an ADC conversion, then it will convert endlessly
+  ADCSRA |= (1<<ADSC);
 
   while(1){
-    // Start ADC conversion for channel 6, volume
-    ADMUX &= ~(1<<MUX0); //ADMUX2:0 = 6
-    ADCSRA |= (1<<ADSC);
-
     // Checking keys 0:5 by setting PB0 to 0, a no_operation is required for sync, see datasheet p60
     PORTB &= ~0x01;
     nop();
@@ -501,15 +523,6 @@ int main(){
     nop();
     keys_18 = ~(PIND);
     PORTB |= 0x10;
-
-    // Recover ADC result for channel 6
-    while(ADCSRA & (1<<ADSC));
-    ADC_tremolo = ADCH;
-
-    // Start ADC conversion for channel 7, pitch shift
-    ADMUX |= (1<<MUX0); //ADMUX2:0 = 7
-    ADCSRA |= (1<<ADSC);
-
     // Checking keys 24:29 by setting PC0 to 0
     PORTC &= ~0x01;
     nop();
@@ -531,10 +544,6 @@ int main(){
     buttons_settings_2 = ~(PIND);
     PORTC |= 0x08;
 
-    // Recover ADC result for channel 7
-    while(ADCSRA & (1<<ADSC));
-    ADC_pitch_shift = ADCH;
-
 #ifdef DEBUG
     // TOREMOVE : sets PB5 to high by putting PD2 to GND and to low by putting PD3 to GND
     if(keys_0 & KEY_0_MSK){
@@ -548,20 +557,7 @@ int main(){
     }
 #endif
 
-    if(flag_request_update){
-      // Update the frequency with its pitch shift
-      // This formula allows for 7 semitones up, more down
-      period_shift_multiplier = ADC_pitch_shift * (-0.002598282) + 1.329981791;
-
-      // Update the velocity multiplier
-      // This formula allows for nulling or doubling the velocity (number is 1/127)
-      velocity_multiplier = ADC_tremolo * 0.007874016;
-
-      // Update the actual analog value
-      setAnalogOut();
-      flag_request_update = 0;
     }
-  }
   // Program won't actually go outside this loop
 
   return EXIT_FAILURE;
