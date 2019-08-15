@@ -40,6 +40,10 @@ void init_serial(){
 }
 
 void midi_behaviour(){
+  // Turn OFF analog LED
+  PORTB &= ~(1<<DDB5);
+
+  // End the initialization process
   init_serial();
   // Enable interrupts
   SREG |= 0x80;

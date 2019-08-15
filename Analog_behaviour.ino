@@ -310,16 +310,81 @@ void setAnalogOut(){
   analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
 
+#ifdef KEY_NUMBER_42
+  // Is key 36 pressed ?
+  if(keys_36 & KEY_0_MSK){
+  T = PERIODS[current_pitch_0 + 36] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
+  }
+  // Is key 37 pressed ?
+  if(keys_36 & KEY_1_MSK){
+  T = PERIODS[current_pitch_0 + 37] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
+  }
+  // Is key 38 pressed ?
+  if(keys_36 & KEY_2_MSK){
+  T = PERIODS[current_pitch_0 + 38] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
+  }
+  // Is key 39 pressed ?
+  if(keys_36 & KEY_3_MSK){
+  T = PERIODS[current_pitch_0 + 39] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
+  }
+  // Is key 40 pressed ?
+  if(keys_36 & KEY_4_MSK){
+  T = PERIODS[current_pitch_0 + 40] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
+  }
+  // Is key 41 pressed ?
+  if(keys_36 & KEY_5_MSK){
+  T = PERIODS[current_pitch_0 + 41] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
+  }
+  // Is key 42 pressed ?
+  if(keys_42 & KEY_0_MSK){
+  T = PERIODS[current_pitch_0 + 42] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
+  }
+  // Is key 43 pressed ?
+  if(keys_42 & KEY_1_MSK){
+  T = PERIODS[current_pitch_0 + 43] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
+  }
+  // Is key 44 pressed ?
+  if(keys_42 & KEY_2_MSK){
+  T = PERIODS[current_pitch_0 + 44] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
+  }
+  // Is key 45 pressed ?
+  if(keys_42 & KEY_3_MSK){
+  T = PERIODS[current_pitch_0 + 45] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
+  }
+  // Is key 46 pressed ?
+  if(keys_42 & KEY_4_MSK){
+  T = PERIODS[current_pitch_0 + 46] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
+  }
+  // Is key 47 pressed ?
+  if(keys_42 & KEY_5_MSK){
+  T = PERIODS[current_pitch_0 + 47] * vibrato_T_multiplier;
+  analog_out_temp += getSquareWave(T, tremolo_multiplier);
+  }
+#endif
+
   // Actually update the analog value
   analog_out = analog_out_temp;
 }
 
 void analog_behaviour(){
+  // Turn OFF the midi LED
+  PORTC &= ~(1<<DDC5);
+
+  // End the initialization process
   init_timer_1();
   // Enable interrupts
   SREG |= 0x80;
-
-  PORTB &= ~(1<<DDB5);
 
   while(1){
     // Recover value from vibrato and tremolo pots

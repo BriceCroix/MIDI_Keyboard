@@ -7,6 +7,9 @@
 #define DEBUG
 
 
+// Define this if you want your keyboard to have 42 keys, 36 else
+//#define KEY_NUMBER_42
+
 #include <avr/io.h>
 #include "binary.h"
 
@@ -34,8 +37,11 @@ volatile uint8_t keys_12 = 0;
 volatile uint8_t keys_18 = 0;
 volatile uint8_t keys_24 = 0;
 volatile uint8_t keys_30 = 0;
-volatile uint8_t buttons_settings_1 = 0;
-volatile uint8_t buttons_settings_2 = 0;
+#ifdef KEY_NUMBER_42
+volatile uint8_t keys_36 = 0;
+volatile uint8_t keys_42 = 0;
+#endif
+volatile uint8_t buttons_settings = 0;
 
 
 /**
@@ -48,15 +54,18 @@ volatile uint8_t keys_12_last = 0;
 volatile uint8_t keys_18_last = 0;
 volatile uint8_t keys_24_last = 0;
 volatile uint8_t keys_30_last = 0;
-volatile uint8_t buttons_settings_1_last = 0;
-volatile uint8_t buttons_settings_2_last = 0;
+#ifdef KEY_NUMBER_42
+volatile uint8_t keys_36_last = 0;
+volatile uint8_t keys_42_last = 0;
+#endif
+volatile uint8_t buttons_settings_last = 0;
 
 
 /**
  * \var pitch_0
  * \brief index of the lowest key, 0 for C0, 2 for D0, 12 for C1...
  */
-volatile uint8_t pitch_0 = 60;
+volatile uint8_t pitch_0 = 36;
 
 
 /**
@@ -90,13 +99,13 @@ void init_pins(){
   // PortB 0 and 2:5 as output for buttons from Keys 0 to 23
   // Built-in led also on PB5 as output
   DDRB |= (1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5);
-  // Turning on all outputs for now
+  // Turning on all outputs for now, except LED
   PORTB |= B00011101;
 
-  // PortC 0:3 as output for keys 24 to 35 and buttons settings 1 and 2
-  DDRC |= (1<<DDC0 | 1<<DDC1 | 1<<DDC2 | 1<<DDC3);
-  // Turning on all outputs for now
-  PORTC |= B00001111;
+  // PortC 0:3 as output for keys 24 to 42 , PC4 for settings buttons and PC5 for LED
+  DDRC |= (1<<DDC0 | 1<<DDC1 | 1<<DDC2 | 1<<DDC3 | 1<<DDC4 | 1<<DDC5 );
+  // Turning on all outputs for now, except LED
+  PORTC |= B00011111;
 }
 
 
@@ -173,16 +182,25 @@ void read_buttons(){
   nop();
   keys_30 = ~(PIND);
   PORTC |= 0x02;
-  // Checking buttons_settings_1 by setting PC2 to 0
+
+#ifdef KEY_NUMBER_42
+  // Checking keys 36:41 by setting PC2 to 0
   PORTC &= ~0x04;
   nop();
-  buttons_settings_1 = ~(PIND);
+  keys_36 = ~(PIND);
   PORTC |= 0x04;
-  // Checking buttons_settings_2 by setting PC3 to 0
+  // Checking keys 42:47 by setting PC3 to 0
   PORTC &= ~0x08;
   nop();
-  buttons_settings_2 = ~(PIND);
+  keys_42 = ~(PIND);
   PORTC |= 0x08;
+#endif
+
+  // Checking buttons_settings by setting PC4 to 0
+  PORTC &= ~0x10;
+  nop();
+  buttons_settings = ~(PIND);
+  PORTC |= 0x10;
 }
 
 
@@ -196,16 +214,14 @@ int main(){
   init_pins();
   init_adc();
 
-  //Turn ON LED
+  //Turn ON analog and midi LEDs
   PORTB |= (1<<DDB5);
+  PORTC |= (1<<DDC5);
 
   // Wait until user press key 0 or key 1
   while( ((keys_0 & KEY_0_MSK) == 0) && ((keys_0 & KEY_1_MSK) == 0)){
     read_buttons();
   }
-
-  // Turn OFF LED
-  PORTB &= ~(1<<DDB5);
 
   // Switch between analog and MIDI depending on the pressed key
   if(keys_0 & KEY_0_MSK){
