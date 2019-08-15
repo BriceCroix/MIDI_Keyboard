@@ -6,21 +6,15 @@
  */
 #define DEBUG
 
+
 #include <avr/io.h>
 #include "binary.h"
 
-// Sample frequency in Hz
-#define SAMPLE_FREQUENCY 31250
-// Sample time in micro second
-#define SAMPLE_TIME 32
+
 // The no-operation function as defined in assembly language
 #define nop() __asm__("nop\n\t")
-// The analog amplitude for one note, defining how many notes can be played at once, here 8 notes because 8*64 = 512
-#define NOTE_AMP 64
 // Number of notes per octave
 #define OCTAVE 12
-// Minimum duty value for analog output, notice NOTE_AMP/2
-#define PWM_MIN 32
 // Masks to check keys level in a key group
 #define KEY_0_MSK 0x04
 #define KEY_1_MSK 0x08
@@ -29,81 +23,41 @@
 #define KEY_4_MSK 0x40
 #define KEY_5_MSK 0x80
 
-/**
- * \var PERIODS
- * \brief Each period in us from C0 to B8
- */
-const uint16_t PERIODS[] = {
-  61156, 57724, 54484, 51426, 48540, 45815, 43244, 40817, 38526, 36364, 34323, 32396, //C0 to B0
-  30578, 28862, 27242, 25713, 24270, 22908, 21622, 20408, 19263, 18182, 17161, 16198, //C1 to B1
-  15289, 14431, 13621, 12856, 12135, 11454, 10811, 10204, 9631,  9091,  8581,  8099,  //C2 to B2
-  7645,  7215,  6810,  6428,  6067,  5727,  5405,  5102,  4816,  4545,  4290,  4050,  //C3 to B3
-  3822,  3608,  3405,  3214,  3034,  2863,  2703,  2551,  2408,  2273,  2145,  2025,  //C4 to B4
-  1911,  1804,  1703,  1607,  1517,  1432,  1351,  1276,  1204,  1136,  1073,  1012,  //C5 to B5
-  956,   902,   851,   804,   758,   716,   676,   638,   602,   568,   536,   506,   //C6 to B6
-  478,   451,   426,   402,   379,   358,   338,   319,   301,   284,   268,   253,   //C7 to B7
-  239,   225,   213,   201,   190,   179,   169,   159,   150,   142,   134,   127    //C8 to B8
-};
-
-/**
- * \var MIDI_NOTES
- * \brief MIDI code for each note
- */
-const uint8_t MIDI_NOTES[] = {
-  0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, //C0 to B0
-  0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, //C1 to B1
-  0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, //C2 to B2
-  0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, //C3 to B3
-  0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, //C4 to B4
-  0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, //C5 to B5
-  0x3c, 0x3d, 0x3e, 0x3f, 0x40, 0x41, 0x42, 0x43, //C6 to B6
-  0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, //C7 to B7
-  0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, //C8 to B8
-};
-
-
 
 /**
  * \var keys_0
  * \brief Stores state of keys 0 to 5, same goes for key_6, key_12 etc. Only the 6 MSB are relevant on these variables. [k5,k4,k3,k2,k1,k0,xx,xx]
  */
-volatile uint8_t keys_0;
-volatile uint8_t keys_6;
-volatile uint8_t keys_12;
-volatile uint8_t keys_18;
-volatile uint8_t keys_24;
-volatile uint8_t keys_30;
-uint8_t buttons_settings_1;
-uint8_t buttons_settings_2;
+volatile uint8_t keys_0 = 0;
+volatile uint8_t keys_6 = 0;
+volatile uint8_t keys_12 = 0;
+volatile uint8_t keys_18 = 0;
+volatile uint8_t keys_24 = 0;
+volatile uint8_t keys_30 = 0;
+volatile uint8_t buttons_settings_1 = 0;
+volatile uint8_t buttons_settings_2 = 0;
+
 
 /**
  * \var keys_0_last
  * \brief stores the state of the keys at last sample
  */
-volatile uint8_t keys_0_last;
-volatile uint8_t keys_6_last;
-volatile uint8_t keys_12_last;
-volatile uint8_t keys_18_last;
-volatile uint8_t keys_24_last;
-volatile uint8_t keys_30_last;
+volatile uint8_t keys_0_last = 0;
+volatile uint8_t keys_6_last = 0;
+volatile uint8_t keys_12_last = 0;
+volatile uint8_t keys_18_last = 0;
+volatile uint8_t keys_24_last = 0;
+volatile uint8_t keys_30_last = 0;
+volatile uint8_t buttons_settings_1_last = 0;
+volatile uint8_t buttons_settings_2_last = 0;
+
 
 /**
  * \var pitch_0
  * \brief index of the lowest key, 0 for C0, 2 for D0, 12 for C1...
  */
-uint8_t pitch_0 = 60;
+volatile uint8_t pitch_0 = 60;
 
-/**
- * \var t
- * \brief time in micro second
- */
-volatile uint64_t t = 0;
-
-/**
- * \var analog_out
- * \brief the analog value to write on the analog output
- */
-volatile uint16_t analog_out = 0;
 
 /**
  * \var ADC_vibrato
@@ -111,46 +65,13 @@ volatile uint16_t analog_out = 0;
  */
 volatile uint8_t ADC_vibrato = 127;
 
+
 /**
  * \var ADC_tremolo
  * \brief Stores the value of the tremolo potentiometer
  */
 volatile uint8_t ADC_tremolo = 127;
 
-/**
- * \fn void init_timer_1()
- * \brief Sets timer 1 in condition to generate PWM signal
- */
-void init_timer_1(){
-  // Enable timer1 with no prescaler, cf doc p110
-  TCCR1B &= ~0x07; // Clears bits CS10:12 that handle timer activation
-  TCCR1B |= (1<<CS10); // The timer is supposed to count at 16 Mhz, an external precision clock could be used if necessary
-
-  // Reset counter value
-  TCNT1 = 0;
-
-  // Enable only OVF interrupts, cf doc p112
-  TIMSK1 = 0;
-  TIMSK1 |= 0x01;
-
-  // Timer 1 in fast PWM mode, cf p108, WGM13:10 = 1110
-  TCCR1A &= ~0x03; // Clear bits WGM10:11
-  TCCR1A |= 1<<WGM11; // Set WGM11 to 1
-  TCCR1B |= 1<<WGM13 | 1<<WGM12; // Set WGM13:12 to 1
-  // In this mode the Auto-Reload value (TOP, or ARR for a STM32) is in the Input Capture Register
-  ICR1 = 0x01FF; // Sampling Frequency = 31250 Hz with 9 bits resolution
-
-  // Connect OC1A to pin PB1 in non-inverting PWM mode, cf p108
-  TCCR1A &= ~0xF0;
-  TCCR1A |= 1<<COM1A1;
-
-  /*arbitrary min value, 512 as ARR authorize 8 notes of 64 as velocity
-   let us use 32 as min value and 480 as max, this means that it will
-   saturate above 7 simultaneous notes*/
-  OCR1A = PWM_MIN;
-
-  // N.B. OC1A (channel A) output is on pin 9 and OC1B on pin 10
-}
 
 /**
  * \fn void init_pins()
@@ -177,6 +98,7 @@ void init_pins(){
   // Turning on all outputs for now
   PORTC |= B00001111;
 }
+
 
 /**
  * \fn void init_adc()
@@ -205,22 +127,7 @@ void init_pins(){
    //Result will be readable in ADCH
  }
 
-/**
- * \fn init_serial()
- * \brief initialize the serial peripheral interface
- */
-void init_serial(){
-  // Enable SPI
-  SPCR |= 0x40;
-  // Disable SPI interrupts
-  SPCR &= ~0x80;
-  // LSB first
-  SPCR |= 0x20;
-  // Master mode
-  SPCR |= 0x10;
-  // Baud rate
-  Serial.begin(9600);
-}
+
 /**
  * \fn disable_ide_stuff()
  * \brief Disables some default functionnalities provided by Arduino IDE
@@ -228,236 +135,6 @@ void init_serial(){
 void disable_ide_stuff(){
   //TODO
   //Disable timer_0, which interrupts to provide delay and millis functions
-}
-
-/**
- * \fn ISR(TIMER1_OVF_vect)
- * \brief interruption code when an ovf occurs on timer 1
- */
-ISR(TIMER1_OVF_vect){
-  // Let us update the analog pin output value
-  OCR1A = analog_out;
-
-  // Let us update time
-  t += SAMPLE_TIME;
-
-  // Update analog value for next sample
-  setAnalogOut();
-}
-
-uint8_t getSquareWave(uint16_t period, float tremolo_multiplier){
-  if(t%period < (period>>1)){
-    //High
-    return (NOTE_AMP * tremolo_multiplier);
-  }else{
-    //Low
-    return 0;
-  }
-}
-
-/**
- * \fn void setAnalogOut()
- * \brief Sets the analog_out value according to the keys state. WARNING : Output should not be written while this function is computing
- */
-void setAnalogOut(){
-  //In order not to access memory multiple times
-  uint8_t current_pitch_0 = pitch_0;
-  //Variable to store current considered period
-  uint16_t T;
-  // Variable to temporarily store analog out
-  uint16_t analog_out_temp = PWM_MIN;
-
-  // Update the frequency with its pitch shift
-  // This formula allows for 7 semitones up, more down
-  float vibrato_T_multiplier = ADC_vibrato * (-0.002598282) + 1.329981791;
-
-  // Update the velocity multiplier
-  // This formula allows for nulling or doubling the velocity (number is 1/127)
-  float tremolo_multiplier = ADC_tremolo * 0.007874016;
-
-  // Is key 0 pressed ?
-  if(keys_0 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 0] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 1 pressed ?
-  if(keys_0 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 1] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 2 pressed ?
-  if(keys_0 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 2] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 3 pressed ?
-  if(keys_0 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 3] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 4 pressed ?
-  if(keys_0 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 4] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 5 pressed ?
-  if(keys_0 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 5] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 6 pressed ?
-  if(keys_6 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 6] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 7 pressed ?
-  if(keys_6 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 7] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 8 pressed ?
-  if(keys_6 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 8] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 9 pressed ?
-  if(keys_6 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 9] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 10 pressed ?
-  if(keys_6 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 10] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 11 pressed ?
-  if(keys_6 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 11] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 12 pressed ?
-  if(keys_12 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 12] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 13 pressed ?
-  if(keys_12 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 13] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 14 pressed ?
-  if(keys_12 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 14] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 15 pressed ?
-  if(keys_12 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 15] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 16 pressed ?
-  if(keys_12 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 16] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 17 pressed ?
-  if(keys_12 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 17] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 18 pressed ?
-  if(keys_18 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 18] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 19 pressed ?
-  if(keys_18 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 19] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 20 pressed ?
-  if(keys_18 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 20] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 21 pressed ?
-  if(keys_18 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 21] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 22 pressed ?
-  if(keys_18 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 22] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 23 pressed ?
-  if(keys_18 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 23] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 24 pressed ?
-  if(keys_24 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 24] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 25 pressed ?
-  if(keys_24 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 25] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 26 pressed ?
-  if(keys_24 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 26] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 27 pressed ?
-  if(keys_24 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 27] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 28 pressed ?
-  if(keys_24 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 28] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 29 pressed ?
-  if(keys_24 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 29] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 30 pressed ?
-  if(keys_30 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 30] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 31 pressed ?
-  if(keys_30 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 31] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 32 pressed ?
-  if(keys_30 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 32] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 33 pressed ?
-  if(keys_30 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 33] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 34 pressed ?
-  if(keys_30 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 34] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 35 pressed ?
-  if(keys_30 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 35] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-
-  // Actually update the analog value
-  analog_out = analog_out_temp;
 }
 
 
@@ -516,54 +193,27 @@ void read_buttons(){
 int main(){
   // Disable interrupts while initializing, cf p11
   SREG &= ~0x80;
-  init_timer_1();
   init_pins();
   init_adc();
-  //init_serial();
-  // Enable interrupts
-  SREG |= 0x80;
 
+  //Turn ON LED
+  PORTB |= (1<<DDB5);
+
+  // Wait until user press key 0 or key 1
+  while( ((keys_0 & KEY_0_MSK) == 0) && ((keys_0 & KEY_1_MSK) == 0)){
+    read_buttons();
+  }
+
+  // Turn OFF LED
   PORTB &= ~(1<<DDB5);
 
-  //Start an ADC conversion, then it will convert endlessly
-  ADCSRA |= (1<<ADSC);
+  // Switch between analog and MIDI depending on the pressed key
+  if(keys_0 & KEY_0_MSK){
+    analog_behaviour();
+  }else if(keys_0 & KEY_1_MSK){
+    midi_behaviour();
+  }
 
-  while(1){
-    // Recover value from vibrato and tremolo pots
-    // If no ADC conversion is running
-    if( !(ADCSRA & (1<<ADSC)) ){
-      // What was the selected channel ?
-      if(ADMUX & (1<<MUX0)){
-        //Channel 7
-        ADC_vibrato = ADCH;
-      }else{
-        //Channel 6
-        ADC_tremolo = ADCH;
-      }
-      //Change channel
-      ADMUX = ADMUX ^ (1<<MUX0);
-
-      //Start new converion
-      ADCSRA |= (1<<ADSC);
-    }
-
-    read_buttons();
-
-#ifdef DEBUG
-    // TOREMOVE : sets PB5 to high by putting PD2 to GND and to low by putting PD3 to GND
-    if(keys_0 & KEY_0_MSK){
-      PORTB |= 1<<DDB5;
-    }
-    if(keys_0 & KEY_1_MSK){
-      PORTB &= ~ (1<<DDB5);
-    }
-    if(keys_0 & KEY_2_MSK){
-      PORTB |= 1<<DDB5;
-    }
-#endif
-
-    }
-  // Program won't actually go outside this loop
-
+  // Program won't actually go here
   return EXIT_FAILURE;
 }
