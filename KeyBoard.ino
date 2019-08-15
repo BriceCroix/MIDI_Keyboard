@@ -189,7 +189,7 @@ void init_pins(){
 
    // ADC Enable
    ADCSRA |= (1<<ADEN);
-   // Prescaler of 64, ADC_CLK = 250kHz
+   // Prescaler of 128, ADC_CLK = 125kHz
    ADCSRA &= ~((1<<ADPS0) | (1<<ADPS1) | (1<<ADPS2) );
    ADCSRA |= (1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 
@@ -460,6 +460,55 @@ void setAnalogOut(){
   analog_out = analog_out_temp;
 }
 
+
+/**
+ * \fn void read_buttons()
+ * \brief update the values of the 36 keys and of the 12 buttons
+ */
+void read_buttons(){
+  // Checking keys 0:5 by setting PB0 to 0, a no_operation is required for sync, see datasheet p60
+  PORTB &= ~0x01;
+  nop();
+  keys_0 = ~(PIND);
+  PORTB |= 0x01;
+  // Checking keys 6:11 by setting PB2 to 0
+  PORTB &= ~0x04;
+  nop();
+  keys_6 = ~(PIND);
+  PORTB |= 0x04;
+  // Checking keys 12:17 by setting PB3 to 0
+  PORTB &= ~0x08;
+  nop();
+  keys_12 = ~(PIND);
+  PORTB |= 0x08;
+  // Checking keys 18:23 by setting PB4 to 0
+  PORTB &= ~0x10;
+  nop();
+  keys_18 = ~(PIND);
+  PORTB |= 0x10;
+  // Checking keys 24:29 by setting PC0 to 0
+  PORTC &= ~0x01;
+  nop();
+  keys_24 = ~(PIND);
+  PORTC |= 0x01;
+  // Checking keys 30:35 by setting PC1 to 0
+  PORTC &= ~0x02;
+  nop();
+  keys_30 = ~(PIND);
+  PORTC |= 0x02;
+  // Checking buttons_settings_1 by setting PC2 to 0
+  PORTC &= ~0x04;
+  nop();
+  buttons_settings_1 = ~(PIND);
+  PORTC |= 0x04;
+  // Checking buttons_settings_2 by setting PC3 to 0
+  PORTC &= ~0x08;
+  nop();
+  buttons_settings_2 = ~(PIND);
+  PORTC |= 0x08;
+}
+
+
 /**
  * \fn void main()
  * \brief main function to loop over and over endlessly
@@ -498,46 +547,7 @@ int main(){
       ADCSRA |= (1<<ADSC);
     }
 
-    // Checking keys 0:5 by setting PB0 to 0, a no_operation is required for sync, see datasheet p60
-    PORTB &= ~0x01;
-    nop();
-    keys_0 = ~(PIND);
-    PORTB |= 0x01;
-    // Checking keys 6:11 by setting PB2 to 0
-    PORTB &= ~0x04;
-    nop();
-    keys_6 = ~(PIND);
-    PORTB |= 0x04;
-    // Checking keys 12:17 by setting PB3 to 0
-    PORTB &= ~0x08;
-    nop();
-    keys_12 = ~(PIND);
-    PORTB |= 0x08;
-    // Checking keys 18:23 by setting PB4 to 0
-    PORTB &= ~0x10;
-    nop();
-    keys_18 = ~(PIND);
-    PORTB |= 0x10;
-    // Checking keys 24:29 by setting PC0 to 0
-    PORTC &= ~0x01;
-    nop();
-    keys_24 = ~(PIND);
-    PORTC |= 0x01;
-    // Checking keys 30:35 by setting PC1 to 0
-    PORTC &= ~0x02;
-    nop();
-    keys_30 = ~(PIND);
-    PORTC |= 0x02;
-    // Checking buttons_settings_1 by setting PC2 to 0
-    PORTC &= ~0x04;
-    nop();
-    buttons_settings_1 = ~(PIND);
-    PORTC |= 0x04;
-    // Checking buttons_settings_2 by setting PC3 to 0
-    PORTC &= ~0x08;
-    nop();
-    buttons_settings_2 = ~(PIND);
-    PORTC |= 0x08;
+    read_buttons();
 
 #ifdef DEBUG
     // TOREMOVE : sets PB5 to high by putting PD2 to GND and to low by putting PD3 to GND
