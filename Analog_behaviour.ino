@@ -310,7 +310,7 @@ void setAnalogOut(){
   analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
 
-#if KEY_NUMBER == 48
+#if KEYS_NUMBER == 48
   // Is key 36 pressed ?
   if(keys_36 & KEY_0_MSK){
   T = PERIODS[current_pitch_0 + 36] * vibrato_T_multiplier;
