@@ -310,7 +310,7 @@ void setAnalogOut(){
   analog_out_temp += getSquareWave(T, tremolo_multiplier);
   }
 
-#ifdef KEY_NUMBER_42
+#if KEY_NUMBER == 48
   // Is key 36 pressed ?
   if(keys_36 & KEY_0_MSK){
   T = PERIODS[current_pitch_0 + 36] * vibrato_T_multiplier;
@@ -377,6 +377,11 @@ void setAnalogOut(){
   analog_out = analog_out_temp;
 }
 
+
+/**
+ * \fn void analog_behaviour()
+ * \brief sets the arduino in order to output analog signal
+ */
 void analog_behaviour(){
   // Turn OFF the midi LED
   PORTC &= ~(1<<DDC5);

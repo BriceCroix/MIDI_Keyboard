@@ -7,8 +7,9 @@
 #define DEBUG
 
 
-// Define this if you want your keyboard to have 42 keys, 36 else
-//#define KEY_NUMBER_42
+// Define the number of keys, 36 or 48
+//#define KEYS_NUMBER 48
+#define KEYS_NUMBER 36
 
 #include <avr/io.h>
 #include "binary.h"
@@ -27,10 +28,10 @@
 #define DEFAULT_PITCH_0 48;
 
 // Max value of the pitch_0 variable, depending on the number of keys
-#ifdef KEY_NUMBER_42
+#if KEY_NUMBER == 48
 #define MAX_PITCH_0 60
 #endif
-#ifndef KEY_NUMBER_42
+#if KEY_NUMBER == 36
 #define MAX_PITCH_0 72
 #endif
 
@@ -53,7 +54,7 @@ volatile uint8_t keys_12 = 0;
 volatile uint8_t keys_18 = 0;
 volatile uint8_t keys_24 = 0;
 volatile uint8_t keys_30 = 0;
-#ifdef KEY_NUMBER_42
+#if KEY_NUMBER == 48
 volatile uint8_t keys_36 = 0;
 volatile uint8_t keys_42 = 0;
 #endif
@@ -70,7 +71,7 @@ volatile uint8_t keys_12_last = 0;
 volatile uint8_t keys_18_last = 0;
 volatile uint8_t keys_24_last = 0;
 volatile uint8_t keys_30_last = 0;
-#ifdef KEY_NUMBER_42
+#if KEY_NUMBER == 48
 volatile uint8_t keys_36_last = 0;
 volatile uint8_t keys_42_last = 0;
 #endif
@@ -199,7 +200,7 @@ void read_buttons(){
   keys_30 = ~(PIND);
   PORTC |= 0x02;
 
-#ifdef KEY_NUMBER_42
+#if KEY_NUMBER == 48
   // Checking keys 36:41 by setting PC2 to 0
   PORTC &= ~0x04;
   nop();
