@@ -388,35 +388,23 @@ void analog_behaviour(){
 
   while(1){
     // Recover value from vibrato and tremolo pots
-    // If no ADC conversion is running
-    if( !(ADCSRA & (1<<ADSC)) ){
-      // What was the selected channel ?
-      if(ADMUX & (1<<MUX0)){
-        //Channel 7
-        ADC_vibrato = ADCH;
-      }else{
-        //Channel 6
-        ADC_tremolo = ADCH;
-      }
-      //Change channel
-      ADMUX = ADMUX ^ (1<<MUX0);
+    read_pots();
 
-      //Start new converion
-      ADCSRA |= (1<<ADSC);
-    }
-
+    // Update the buttons and keys value
     read_buttons();
 
+    // Handle octave and semitones change
+    process_settings();
+    // Keep previous value of settings buttons
+    buttons_settings_last = buttons_settings;
+
 #ifdef DEBUG
-    // TOREMOVE : sets PB5 to high by putting PD2 to GND and to low by putting PD3 to GND
-    if(keys_0 & KEY_0_MSK){
-      PORTB |= 1<<DDB5;
-    }
+    // TOREMOVE : sets PC5 to high by putting PD3 to GND and to low by putting PD4 to GND
     if(keys_0 & KEY_1_MSK){
-      PORTB &= ~ (1<<DDB5);
+      PORTC |= (1<<DDC5);
     }
     if(keys_0 & KEY_2_MSK){
-      PORTB |= 1<<DDB5;
+      PORTC &= ~ (1<<DDC5);
     }
 #endif
 

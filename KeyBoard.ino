@@ -16,8 +16,24 @@
 
 // The no-operation function as defined in assembly language
 #define nop() __asm__("nop\n\t")
+
 // Number of notes per octave
 #define OCTAVE 12
+
+// Number of available notes
+#define NOTE_NUMBER 108
+
+// Initial value of pitch_0
+#define DEFAULT_PITCH_0 48;
+
+// Max value of the pitch_0 variable, depending on the number of keys
+#ifdef KEY_NUMBER_42
+#define MAX_PITCH_0 60
+#endif
+#ifndef KEY_NUMBER_42
+#define MAX_PITCH_0 72
+#endif
+
 // Masks to check keys level in a key group
 #define KEY_0_MSK 0x04
 #define KEY_1_MSK 0x08
@@ -65,7 +81,7 @@ volatile uint8_t buttons_settings_last = 0;
  * \var pitch_0
  * \brief index of the lowest key, 0 for C0, 2 for D0, 12 for C1...
  */
-volatile uint8_t pitch_0 = 36;
+volatile int8_t pitch_0 = DEFAULT_PITCH_0;
 
 
 /**
@@ -201,6 +217,73 @@ void read_buttons(){
   nop();
   buttons_settings = ~(PIND);
   PORTC |= 0x10;
+}
+
+
+/**
+ * \fn void read_pots
+ * \brief update, if available, the value of potentiometers
+ */
+void read_pots(){
+  // If no ADC conversion is running
+  if( !(ADCSRA & (1<<ADSC)) ){
+    // What was the selected channel ?
+    if(ADMUX & (1<<MUX0)){
+      //Channel 7
+      ADC_vibrato = ADCH;
+    }else{
+      //Channel 6
+      ADC_tremolo = ADCH;
+    }
+    //Change channel
+    ADMUX = ADMUX ^ (1<<MUX0);
+
+    //Start new converion
+    ADCSRA |= (1<<ADSC);
+  }
+}
+
+
+/**
+ * \fn void process_settings()
+ * \brief Handles the settings buttons, without updating buttons_settings_last
+ */
+void process_settings(){
+  if(buttons_settings & B11111100){
+    // If at least one button is pressed
+    if((buttons_settings & KEY_0_MSK) && !(buttons_settings_last & KEY_0_MSK)){
+      // If first button was just pressed, minus an octave
+      pitch_0 -= OCTAVE;
+      // Verify that pitch do not goes sub 0
+      if(pitch_0 < 0) pitch_0 = 0;
+    }
+    if((buttons_settings & KEY_1_MSK) && !(buttons_settings_last & KEY_1_MSK)){
+      // If second button was just pressed, add an octave
+      pitch_0 += OCTAVE;
+      // Verify that pitch do not exceed max value
+      if(pitch_0 > MAX_PITCH_0) pitch_0 = MAX_PITCH_0;
+    }
+    if((buttons_settings & KEY_2_MSK) && !(buttons_settings_last & KEY_2_MSK)){
+      // If third button was just pressed, minus a semitone
+      pitch_0 -= 1;
+      // Verify that pitch do not goes sub 0
+      if(pitch_0 < 0) pitch_0 = 0;
+    }
+    if((buttons_settings & KEY_3_MSK) && !(buttons_settings_last & KEY_3_MSK)){
+      // If fourth button was just pressed, add a semitone
+      pitch_0 += 1;
+      // Verify that pitch do not exceed max value
+      if(pitch_0 > MAX_PITCH_0) pitch_0 = MAX_PITCH_0;
+    }
+    if((buttons_settings & KEY_4_MSK) && !(buttons_settings_last & KEY_4_MSK)){
+      // If sixth button was just pressed, reset pitch_0 to closest C
+      pitch_0 -= pitch_0 % OCTAVE;
+    }
+    if((buttons_settings & KEY_5_MSK) && !(buttons_settings_last & KEY_5_MSK)){
+      // If fifth button was just pressed, reset pitch_0
+      pitch_0 = DEFAULT_PITCH_0;
+    }
+  }
 }
 
 
