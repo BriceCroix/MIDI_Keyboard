@@ -90,7 +90,7 @@ volatile int8_t pitch_0 = DEFAULT_PITCH_0;
  * \var ADC_vibrato
  * \brief Stores the value of the vibrato potentiometer
  */
-volatile uint8_t ADC_vibrato = 127;
+volatile uint8_t ADC_vibrato = 128;
 
 
 /**
@@ -104,7 +104,7 @@ volatile uint8_t ADC_vibrato_flag = 0;
  * \var ADC_tremolo
  * \brief Stores the value of the tremolo potentiometer
  */
-volatile uint8_t ADC_tremolo = 127;
+volatile uint8_t ADC_tremolo = 128;
 
 
 /**

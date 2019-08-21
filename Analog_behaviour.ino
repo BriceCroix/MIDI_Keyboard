@@ -123,11 +123,11 @@ void setAnalogOut(){
 
   // Update the frequency with its pitch shift
   // This formula allows for 7 semitones up, more down
-  float vibrato_T_multiplier = ADC_vibrato * (-0.002598282) + 1.329981791;
+  float vibrato_T_multiplier = ADC_vibrato * (-0.002618740731614038) + 1.3351988136465969
 
   // Update the velocity multiplier
-  // This formula allows for nulling or doubling the velocity (number is 1/127)
-  float tremolo_multiplier = ADC_tremolo * 0.007874016;
+  // This formula allows for nulling or doubling the velocity (number is 1/128)
+  float tremolo_multiplier = ADC_tremolo * 0.0078125
 
   // Is key 0 pressed ?
   if(keys_0 & KEY_0_MSK){
