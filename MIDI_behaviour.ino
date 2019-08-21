@@ -7,6 +7,8 @@
 // Midi code for C0
 #define MIDI_C0 0x0c
 
+// Macro function to send a byte, waits for buffer to be empty
+#define USART_SEND(byte) while(!(UCSR0A & B00100000)); UDR0 = byte
 
 /**
  * \var MIDI_NOTES
@@ -29,9 +31,25 @@ const uint8_t MIDI_NOTES[] = {
  * \fn init_serial()
  * \brief initialize the serial peripheral interface
  */
-void init_serial(){
-  // Baud rate
-  Serial.begin(9600);
+void init_USART(){
+  // See documentation p159
+
+  // Baud rate is 9600
+  // UBRR = F_CPU/(16*BAUD) - 1 = 16MHz / (16*9600) - 1 = 103
+  UBRR0 = 103;
+
+  // Not double speed
+  UCSR0A &= ~(1<<U2X0);
+
+  // Enable transmitter TX
+  UCSR0B |= (1<<TXEN0);
+
+  // Asynchronous mode
+  UCSR0C &= ~(1<<UMSEL00 | 1<<UMSEL01);
+
+  // 8 bits words
+  UCSR0C &= ~(1<<UCSZ00 | 1<<UCSZ01 | 1<<UCSZ02);
+  UCSR0C |= (1<<UCSZ00 | 1<<UCSZ01);
 }
 
 
@@ -546,19 +564,19 @@ void process_keys_MIDI(){
 
   if(note_ON_queue_len + note_OFF_queue_len > 0){
     // Send note ON event en channel 0
-    Serial.write(0x90);
+    USART_SEND(0x90);
     for(i=0 ; i<note_ON_queue_len ; i++){
       // Write note
-      Serial.write(note_ON_queue[i]);
+      USART_SEND(note_ON_queue[i]);
       // Write corresponding velocity, 0x40 is default
-      Serial.write(0x40);
+      USART_SEND(0x40);
     }
     // Send note OFF event with running mode, velocity is 0
     for(i=0 ; i<note_OFF_queue_len ; i++){
       // Write note
-      Serial.write(note_OFF_queue[i]);
+      USART_SEND(note_OFF_queue[i]);
       // Write corresponding velocity, 0x00 tu turn off
-      Serial.write(0x00);
+      USART_SEND(0x00);
     }
   }
 }
@@ -573,7 +591,7 @@ void midi_behaviour(){
   PORTB &= ~(1<<DDB5);
 
   // End the initialization process
-  init_serial();
+  init_USART();
   // Enable interrupts
   SREG |= 0x80;
 
