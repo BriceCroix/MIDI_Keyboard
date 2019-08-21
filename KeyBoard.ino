@@ -12,6 +12,7 @@
 #define KEYS_NUMBER 36
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include "binary.h"
 
 
@@ -93,10 +94,24 @@ volatile uint8_t ADC_vibrato = 127;
 
 
 /**
+ * \var ADC_vibrato_flag
+ * \brief A flag to indicate that the ADC vibrato value has been updated
+ */
+volatile uint8_t ADC_vibrato_flag = 0;
+
+
+/**
  * \var ADC_tremolo
  * \brief Stores the value of the tremolo potentiometer
  */
 volatile uint8_t ADC_tremolo = 127;
+
+
+/**
+ * \var ADC_tremolo_flag
+ * \brief A flag to indicate that the ADC tremolo value has been updated
+ */
+volatile uint8_t ADC_tremolo_flag = 0;
 
 
 /**
@@ -230,16 +245,24 @@ void read_pots(){
   if( !(ADCSRA & (1<<ADSC)) ){
     // What was the selected channel ?
     if(ADMUX & (1<<MUX0)){
-      //Channel 7
-      ADC_vibrato = ADCH;
+      // Channel 7
+      // Only act when there is a change
+      if(ADC_vibrato != ADCH){
+        ADC_vibrato = ADCH;
+        ADC_vibrato_flag = 1;
+      }
     }else{
-      //Channel 6
-      ADC_tremolo = ADCH;
+      // Channel 6
+      // Only act when there is a change
+      if(ADC_tremolo != ADCH){
+        ADC_tremolo = ADCH;
+        ADC_tremolo_flag = 1;
+      }
     }
-    //Change channel
+    // Change channel
     ADMUX = ADMUX ^ (1<<MUX0);
 
-    //Start new converion
+    // Start new conversion
     ADCSRA |= (1<<ADSC);
   }
 }

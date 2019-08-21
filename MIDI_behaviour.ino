@@ -598,6 +598,22 @@ void midi_behaviour(){
   while(1){
     // Recover value from vibrato and tremolo pots
     read_pots();
+    // Send vibrato message if necessary
+    if(ADC_vibrato_flag){
+      USART_SEND(0xE0); // Indicates a pitch change
+      USART_SEND(ADC_vibrato<<7); // LSByte of pitch change, only LSBit of ADC value
+      USART_SEND(ADC_vibrato>>1); // MSByte of pitch change, 7 MSBits of ADC value
+      // Reset flag
+      ADC_vibrato_flag = 0;
+    }
+    // Send tremolo message if necessary
+    if(ADC_tremolo_flag){
+      USART_SEND(0xB0); // Controller change
+      USART_SEND(0x07); // Overall volume
+      USART_SEND(ADC_tremolo); // Volume value
+      // Reset flag
+      ADC_tremolo_flag = 0;
+    }
 
     // Update the buttons and keys value
     read_buttons();
