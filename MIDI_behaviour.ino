@@ -7,9 +7,6 @@
 // Midi code for C0
 #define MIDI_C0 0x0c
 
-// Macro function to send a byte, waits for buffer to be empty
-#define USART_SEND(byte) while(!(UCSR0A & B00100000)); UDR0 = byte
-
 /**
  * \var MIDI_NOTES
  * \brief MIDI code for each note

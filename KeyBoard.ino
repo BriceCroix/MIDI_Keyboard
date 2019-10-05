@@ -44,6 +44,8 @@
 #define KEY_4_MSK 0x40
 #define KEY_5_MSK 0x80
 
+// Macro function to send a byte, waits for buffer to be empty
+#define USART_SEND(byte) while(!(UCSR0A & B00100000)); UDR0 = byte
 
 /**
  * \var keys_0

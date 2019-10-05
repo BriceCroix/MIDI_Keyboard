@@ -391,6 +391,11 @@ void analog_behaviour(){
   // Enable interrupts
   SREG |= 0x80;
 
+  // For Debugging purpose
+  #ifdef DEBUG
+  init_USART();
+  #endif
+
   while(1){
     // Recover value from vibrato and tremolo pots
     read_pots();
@@ -403,15 +408,64 @@ void analog_behaviour(){
     // Keep previous value of settings buttons
     buttons_settings_last = buttons_settings;
 
-#ifdef DEBUG
-    // TOREMOVE : sets PC5 to high by putting PD3 to GND and to low by putting PD4 to GND
-    if(keys_0 & KEY_1_MSK){
-      PORTC |= (1<<DDC5);
-    }
-    if(keys_0 & KEY_2_MSK){
-      PORTC &= ~ (1<<DDC5);
-    }
-#endif
+    // For Debugging purpose
+    #ifdef DEBUG
+
+    // sets PC5 to high by putting PD3 to GND and to low by putting PD4 to GND
+    if(keys_0 & KEY_1_MSK) PORTC |= (1<<DDC5);
+    if(keys_0 & KEY_2_MSK) PORTC &= ~(1<<DDC5);
+
+    if(keys_0 & KEY_0_MSK){ USART_SEND('0'); USART_SEND('\n');}
+    if(keys_0 & KEY_1_MSK){ USART_SEND('1'); USART_SEND('\n');}
+    if(keys_0 & KEY_2_MSK){ USART_SEND('2'); USART_SEND('\n');}
+    if(keys_0 & KEY_3_MSK){ USART_SEND('3'); USART_SEND('\n');}
+    if(keys_0 & KEY_4_MSK){ USART_SEND('4'); USART_SEND('\n');}
+    if(keys_0 & KEY_5_MSK){ USART_SEND('5'); USART_SEND('\n');}
+    if(keys_6 & KEY_0_MSK){ USART_SEND('6'); USART_SEND('\n');}
+    if(keys_6 & KEY_1_MSK){ USART_SEND('7'); USART_SEND('\n');}
+    if(keys_6 & KEY_2_MSK){ USART_SEND('8'); USART_SEND('\n');}
+    if(keys_6 & KEY_3_MSK){ USART_SEND('9'); USART_SEND('\n');}
+    if(keys_6 & KEY_4_MSK){ USART_SEND('1'); USART_SEND('0'); USART_SEND('\n');}
+    if(keys_6 & KEY_5_MSK){ USART_SEND('1'); USART_SEND('1'); USART_SEND('\n');}
+    if(keys_12 & KEY_0_MSK){ USART_SEND('1'); USART_SEND('2'); USART_SEND('\n');}
+    if(keys_12 & KEY_1_MSK){ USART_SEND('1'); USART_SEND('3'); USART_SEND('\n');}
+    if(keys_12 & KEY_2_MSK){ USART_SEND('1'); USART_SEND('4'); USART_SEND('\n');}
+    if(keys_12 & KEY_3_MSK){ USART_SEND('1'); USART_SEND('5'); USART_SEND('\n');}
+    if(keys_12 & KEY_4_MSK){ USART_SEND('1'); USART_SEND('6'); USART_SEND('\n');}
+    if(keys_12 & KEY_5_MSK){ USART_SEND('1'); USART_SEND('7'); USART_SEND('\n');}
+    if(keys_18 & KEY_0_MSK){ USART_SEND('1'); USART_SEND('8'); USART_SEND('\n');}
+    if(keys_18 & KEY_1_MSK){ USART_SEND('1'); USART_SEND('9'); USART_SEND('\n');}
+    if(keys_18 & KEY_2_MSK){ USART_SEND('2'); USART_SEND('0'); USART_SEND('\n');}
+    if(keys_18 & KEY_3_MSK){ USART_SEND('2'); USART_SEND('1'); USART_SEND('\n');}
+    if(keys_18 & KEY_4_MSK){ USART_SEND('2'); USART_SEND('2'); USART_SEND('\n');}
+    if(keys_18 & KEY_5_MSK){ USART_SEND('2'); USART_SEND('3'); USART_SEND('\n');}
+    if(keys_24 & KEY_1_MSK){ USART_SEND('2'); USART_SEND('4'); USART_SEND('\n');}
+    if(keys_24 & KEY_0_MSK){ USART_SEND('2'); USART_SEND('5'); USART_SEND('\n');}
+    if(keys_24 & KEY_2_MSK){ USART_SEND('2'); USART_SEND('6'); USART_SEND('\n');}
+    if(keys_24 & KEY_3_MSK){ USART_SEND('2'); USART_SEND('7'); USART_SEND('\n');}
+    if(keys_24 & KEY_4_MSK){ USART_SEND('2'); USART_SEND('8'); USART_SEND('\n');}
+    if(keys_24 & KEY_5_MSK){ USART_SEND('2'); USART_SEND('9'); USART_SEND('\n');}
+    if(keys_30 & KEY_0_MSK){ USART_SEND('3'); USART_SEND('0'); USART_SEND('\n');}
+    if(keys_30 & KEY_1_MSK){ USART_SEND('3'); USART_SEND('1'); USART_SEND('\n');}
+    if(keys_30 & KEY_2_MSK){ USART_SEND('3'); USART_SEND('2'); USART_SEND('\n');}
+    if(keys_30 & KEY_3_MSK){ USART_SEND('3'); USART_SEND('3'); USART_SEND('\n');}
+    if(keys_30 & KEY_4_MSK){ USART_SEND('3'); USART_SEND('4'); USART_SEND('\n');}
+    if(keys_30 & KEY_5_MSK){ USART_SEND('3'); USART_SEND('5'); USART_SEND('\n');}
+    #if KEYS_NUMBER==48
+    if(keys_36 & KEY_0_MSK){ USART_SEND('3'); USART_SEND('6'); USART_SEND('\n');}
+    if(keys_36 & KEY_1_MSK){ USART_SEND('3'); USART_SEND('7'); USART_SEND('\n');}
+    if(keys_36 & KEY_2_MSK){ USART_SEND('3'); USART_SEND('8'); USART_SEND('\n');}
+    if(keys_36 & KEY_3_MSK){ USART_SEND('3'); USART_SEND('9'); USART_SEND('\n');}
+    if(keys_36 & KEY_4_MSK){ USART_SEND('4'); USART_SEND('0'); USART_SEND('\n');}
+    if(keys_36 & KEY_5_MSK){ USART_SEND('4'); USART_SEND('1'); USART_SEND('\n');}
+    if(keys_42 & KEY_0_MSK){ USART_SEND('4'); USART_SEND('2'); USART_SEND('\n');}
+    if(keys_42 & KEY_1_MSK){ USART_SEND('4'); USART_SEND('3'); USART_SEND('\n');}
+    if(keys_42 & KEY_2_MSK){ USART_SEND('4'); USART_SEND('4'); USART_SEND('\n');}
+    if(keys_42 & KEY_3_MSK){ USART_SEND('4'); USART_SEND('5'); USART_SEND('\n');}
+    if(keys_42 & KEY_4_MSK){ USART_SEND('4'); USART_SEND('6'); USART_SEND('\n');}
+    if(keys_42 & KEY_5_MSK){ USART_SEND('4'); USART_SEND('7'); USART_SEND('\n');}
+    #endif
+    #endif
 
     }
 }
