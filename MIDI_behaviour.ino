@@ -28,8 +28,8 @@ const uint8_t MIDI_NOTES[] = {
 
 
 /**
- * \fn init_serial()
- * \brief initialize the serial peripheral interface
+ * \fn init_USART()
+ * \brief initialize the USART communication protocol
  */
 void init_USART(){
   // See documentation p159
