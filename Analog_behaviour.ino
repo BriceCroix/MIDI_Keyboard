@@ -5,10 +5,10 @@
  */
 
 
-// Minimum duty value for analog output, notice NOTE_AMP/2
+// Minimum duty value for analog output, notice PWM_NOTE_AMP/2
 #define PWM_MIN 32
 // The analog amplitude for one note, defining how many notes can be played at once, here 8 notes because 8*64 = 512
-#define NOTE_AMP 64
+#define PWM_NOTE_AMP 64
 // Sample frequency in Hz
 #define SAMPLE_FREQUENCY 31250
 // Sample time in micro second
@@ -101,7 +101,7 @@ ISR(TIMER1_OVF_vect){
 uint8_t getSquareWave(uint16_t period, float tremolo_multiplier){
   if(t%period < (period>>1)){
     //High
-    return (NOTE_AMP * tremolo_multiplier);
+    return (PWM_NOTE_AMP * tremolo_multiplier);
   }else{
     //Low
     return 0;
@@ -111,7 +111,7 @@ uint8_t getSquareWave(uint16_t period, float tremolo_multiplier){
 uint8_t getSquareWave(uint16_t period){
   if(t%period < (period>>1)){
     //High
-    return NOTE_AMP;
+    return PWM_NOTE_AMP;
   }else{
     //Low
     return 0;
@@ -121,7 +121,7 @@ uint8_t getSquareWave(uint16_t period){
 
 /**
  * \fn void setAnalogOut()
- * \brief Sets the analog_out value according to the keys state. WARNING : Output should not be written while this function is computing
+ * \brief Sets the analog_out value according to the keys state.
  */
 void setAnalogOut(){
   //In order not to access memory multiple times
@@ -144,10 +144,10 @@ void setAnalogOut(){
   // Is key 0 pressed ?
 if(keys_0 & KEY_0_MSK){
 #ifdef ENABLE_TREMOLO_VIBRATO
-T = PERIODS[current_pitch_0 + 0] * vibrato_T_multiplier;
+T = PERIODS[current_pitch_0] * vibrato_T_multiplier;
 analog_out_temp += getSquareWave(T, tremolo_multiplier);
 #else
-T = PERIODS[current_pitch_0 + 0];
+T = PERIODS[current_pitch_0];
 analog_out_temp += getSquareWave(T);
 #endif
 }
