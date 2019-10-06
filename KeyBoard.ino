@@ -48,6 +48,7 @@
 #define KEY_3_MSK 0x20
 #define KEY_4_MSK 0x40
 #define KEY_5_MSK 0x80
+#define KEYS_RELEVANT_MSK B11111100
 
 // Macro function to send a byte, waits for buffer to be empty
 #define USART_SEND(byte) while(!(UCSR0A & B00100000)); UDR0 = byte
@@ -199,31 +200,37 @@ void read_buttons(){
   PORTB &= ~0x01;
   nop();
   keys_0 = ~(PIND);
+  keys_0 &= KEYS_RELEVANT_MSK;
   PORTB |= 0x01;
   // Checking keys 6:11 by setting PB2 to 0
   PORTB &= ~0x04;
   nop();
   keys_6 = ~(PIND);
+  keys_6 &= KEYS_RELEVANT_MSK;
   PORTB |= 0x04;
   // Checking keys 12:17 by setting PB3 to 0
   PORTB &= ~0x08;
   nop();
   keys_12 = ~(PIND);
+  keys_12 &= KEYS_RELEVANT_MSK;
   PORTB |= 0x08;
   // Checking keys 18:23 by setting PB4 to 0
   PORTB &= ~0x10;
   nop();
   keys_18 = ~(PIND);
+  keys_18 &= KEYS_RELEVANT_MSK;
   PORTB |= 0x10;
   // Checking keys 24:29 by setting PC0 to 0
   PORTC &= ~0x01;
   nop();
   keys_24 = ~(PIND);
+  keys_24 &= KEYS_RELEVANT_MSK;
   PORTC |= 0x01;
   // Checking keys 30:35 by setting PC1 to 0
   PORTC &= ~0x02;
   nop();
   keys_30 = ~(PIND);
+  keys_30 &= KEYS_RELEVANT_MSK;
   PORTC |= 0x02;
 
 #if KEYS_NUMBER == 48
@@ -231,11 +238,13 @@ void read_buttons(){
   PORTC &= ~0x04;
   nop();
   keys_36 = ~(PIND);
+  keys_36 &= KEYS_RELEVANT_MSK;
   PORTC |= 0x04;
   // Checking keys 42:47 by setting PC3 to 0
   PORTC &= ~0x08;
   nop();
   keys_42 = ~(PIND);
+  keys_42 &= KEYS_RELEVANT_MSK;
   PORTC |= 0x08;
 #endif
 
@@ -243,6 +252,7 @@ void read_buttons(){
   PORTC &= ~0x10;
   nop();
   buttons_settings = ~(PIND);
+  buttons_settings &= KEYS_RELEVANT_MSK;
   PORTC |= 0x10;
 }
 
