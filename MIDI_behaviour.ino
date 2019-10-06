@@ -6,6 +6,17 @@
 
 // Midi code for C0
 #define MIDI_C0 0x0c
+// Used Midi channel
+#define MIDI_CHANNEL 0x00
+// Midi messages codes for channel 0
+#define MIDI_MSG_NOTE_OFF 0x80
+#define MIDI_MSG_NOTE_ON 0x90
+#define MIDI_MSG_AFTERTOUCH_SINGLE 0xA0
+#define MIDI_MSG_CONTROLLER_CHANGE 0xB0
+#define MIDI_MSG_PROGRAM_CHANGE 0xC0
+#define MIDI_MSG_AFTERTOUCH_ALL 0xD0
+#define MIDI_MSG_PITCH_BEND 0xE0
+
 
 /**
  * \var MIDI_NOTES
@@ -539,7 +550,7 @@ void process_keys_MIDI(){
 
   if(note_ON_queue_len + note_OFF_queue_len > 0){
     // Send note ON event en channel 0
-    USART_SEND(0x90);
+    USART_SEND(MIDI_MSG_NOTE_ON | MIDI_CHANNEL);
     for(i=0 ; i<note_ON_queue_len ; i++){
       // Write note
       USART_SEND(note_ON_queue[i]);
@@ -575,17 +586,27 @@ void midi_behaviour(){
     read_pots();
     // Send vibrato message if necessary
     if(ADC_vibrato_flag){
-      USART_SEND(0xE0); // Indicates a pitch change
+      #ifndef DEBUG
+      USART_SEND(MIDI_MSG_PITCH_BEND); // Indicates a pitch change
       USART_SEND(ADC_vibrato<<7); // LSByte of pitch change, only LSBit of ADC value
       USART_SEND(ADC_vibrato>>1); // MSByte of pitch change, 7 MSBits of ADC value
+      #endif
+      #ifdef DEBUG
+      USART_SEND('v'); USART_SEND(ADC_vibrato); USART_SEND('\n');
+      #endif
       // Reset flag
       ADC_vibrato_flag = 0;
     }
     // Send tremolo message if necessary
     if(ADC_tremolo_flag){
-      USART_SEND(0xB0); // Controller change
-      USART_SEND(0x07); // Overall volume
+      #ifndef DEBUG
+      USART_SEND(MIDI_MSG_CONTROLLER_CHANGE); // Controller change
+      USART_SEND(0x07); // Overall volume code
       USART_SEND(ADC_tremolo); // Volume value
+      #endif
+      #ifdef DEBUG
+      USART_SEND('t'); USART_SEND(ADC_tremolo); USART_SEND('\n');
+      #endif
       // Reset flag
       ADC_tremolo_flag = 0;
     }
