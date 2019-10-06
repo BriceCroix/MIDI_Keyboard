@@ -4,12 +4,17 @@
  * \author Brice Croix
  * \date june 25 of 2019
  */
+
+ // Enables the debug functionalities
 #define DEBUG
 
 
 // Define the number of keys, 36 or 48
 //#define KEYS_NUMBER 48
 #define KEYS_NUMBER 36
+
+// Enables the tremolo and vibrato potentiometers
+//#define ENABLE_TREMOLO_VIBRATO
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -88,6 +93,7 @@ volatile uint8_t buttons_settings_last = 0;
 volatile int8_t pitch_0 = DEFAULT_PITCH_0;
 
 
+#ifdef ENABLE_TREMOLO_VIBRATO
 /**
  * \var ADC_vibrato
  * \brief Stores the value of the vibrato potentiometer
@@ -114,6 +120,7 @@ volatile uint8_t ADC_tremolo = 128;
  * \brief A flag to indicate that the ADC tremolo value has been updated
  */
 volatile uint8_t ADC_tremolo_flag = 0;
+#endif
 
 
 /**
@@ -143,6 +150,7 @@ void init_pins(){
 }
 
 
+#ifdef ENABLE_TREMOLO_VIBRATO
 /**
  * \fn void init_adc()
  * \brief Enables the ADC with no ADC clock prescaler
@@ -169,6 +177,7 @@ void init_pins(){
 
    //Result will be readable in ADCH
  }
+#endif
 
 
 /**
@@ -238,6 +247,7 @@ void read_buttons(){
 }
 
 
+#ifdef ENABLE_TREMOLO_VIBRATO
 /**
  * \fn void read_pots
  * \brief update, if available, the value of potentiometers
@@ -268,6 +278,7 @@ void read_pots(){
     ADCSRA |= (1<<ADSC);
   }
 }
+#endif
 
 
 /**
@@ -302,11 +313,11 @@ void process_settings(){
       if(pitch_0 > MAX_PITCH_0) pitch_0 = MAX_PITCH_0;
     }
     if((buttons_settings & KEY_4_MSK) && !(buttons_settings_last & KEY_4_MSK)){
-      // If sixth button was just pressed, reset pitch_0 to closest C
+      // If fifth button was just pressed, reset pitch_0 to closest C
       pitch_0 -= pitch_0 % OCTAVE;
     }
     if((buttons_settings & KEY_5_MSK) && !(buttons_settings_last & KEY_5_MSK)){
-      // If fifth button was just pressed, reset pitch_0
+      // If sixth button was just pressed, reset pitch_0
       pitch_0 = DEFAULT_PITCH_0;
     }
   }
@@ -321,7 +332,10 @@ int main(){
   // Disable interrupts while initializing, cf p11
   SREG &= ~0x80;
   init_pins();
+  
+  #ifdef ENABLE_TREMOLO_VIBRATO
   init_adc();
+  #endif
 
   //Turn ON analog and midi LEDs
   PORTB |= (1<<DDB5);

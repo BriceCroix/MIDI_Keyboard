@@ -97,7 +97,7 @@ ISR(TIMER1_OVF_vect){
   setAnalogOut();
 }
 
-
+#ifdef ENABLE_TREMOLO_VIBRATO
 uint8_t getSquareWave(uint16_t period, float tremolo_multiplier){
   if(t%period < (period>>1)){
     //High
@@ -107,7 +107,17 @@ uint8_t getSquareWave(uint16_t period, float tremolo_multiplier){
     return 0;
   }
 }
-
+#else
+uint8_t getSquareWave(uint16_t period){
+  if(t%period < (period>>1)){
+    //High
+    return NOTE_AMP;
+  }else{
+    //Low
+    return 0;
+  }
+}
+#endif
 
 /**
  * \fn void setAnalogOut()
@@ -121,6 +131,7 @@ void setAnalogOut(){
   // Variable to temporarily store analog out
   uint16_t analog_out_temp = PWM_MIN;
 
+  #ifdef ENABLE_TREMOLO_VIBRATO
   // Update the frequency with its pitch shift
   // This formula allows for 7 semitones up, more down
   float vibrato_T_multiplier = ADC_vibrato * (-0.002618740731614038) + 1.3351988136465969;
@@ -128,249 +139,491 @@ void setAnalogOut(){
   // Update the velocity multiplier
   // This formula allows for nulling or doubling the velocity (number is 1/128)
   float tremolo_multiplier = ADC_tremolo * 0.0078125;
+  #endif
 
   // Is key 0 pressed ?
-  if(keys_0 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 0] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 1 pressed ?
-  if(keys_0 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 1] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 2 pressed ?
-  if(keys_0 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 2] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 3 pressed ?
-  if(keys_0 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 3] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 4 pressed ?
-  if(keys_0 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 4] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 5 pressed ?
-  if(keys_0 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 5] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 6 pressed ?
-  if(keys_6 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 6] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 7 pressed ?
-  if(keys_6 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 7] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 8 pressed ?
-  if(keys_6 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 8] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 9 pressed ?
-  if(keys_6 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 9] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 10 pressed ?
-  if(keys_6 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 10] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 11 pressed ?
-  if(keys_6 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 11] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 12 pressed ?
-  if(keys_12 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 12] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 13 pressed ?
-  if(keys_12 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 13] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 14 pressed ?
-  if(keys_12 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 14] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 15 pressed ?
-  if(keys_12 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 15] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 16 pressed ?
-  if(keys_12 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 16] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 17 pressed ?
-  if(keys_12 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 17] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 18 pressed ?
-  if(keys_18 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 18] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 19 pressed ?
-  if(keys_18 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 19] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 20 pressed ?
-  if(keys_18 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 20] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 21 pressed ?
-  if(keys_18 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 21] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 22 pressed ?
-  if(keys_18 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 22] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 23 pressed ?
-  if(keys_18 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 23] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 24 pressed ?
-  if(keys_24 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 24] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 25 pressed ?
-  if(keys_24 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 25] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 26 pressed ?
-  if(keys_24 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 26] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 27 pressed ?
-  if(keys_24 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 27] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 28 pressed ?
-  if(keys_24 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 28] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 29 pressed ?
-  if(keys_24 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 29] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 30 pressed ?
-  if(keys_30 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 30] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 31 pressed ?
-  if(keys_30 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 31] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 32 pressed ?
-  if(keys_30 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 32] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 33 pressed ?
-  if(keys_30 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 33] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 34 pressed ?
-  if(keys_30 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 34] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 35 pressed ?
-  if(keys_30 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 35] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
+if(keys_0 & KEY_0_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 0] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 0];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 1 pressed ?
+if(keys_0 & KEY_1_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 1] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 1];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 2 pressed ?
+if(keys_0 & KEY_2_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 2] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 2];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 3 pressed ?
+if(keys_0 & KEY_3_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 3] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 3];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 4 pressed ?
+if(keys_0 & KEY_4_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 4] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 4];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 5 pressed ?
+if(keys_0 & KEY_5_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 5] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 5];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 6 pressed ?
+if(keys_6 & KEY_0_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 6] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 6];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 7 pressed ?
+if(keys_6 & KEY_1_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 7] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 7];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 8 pressed ?
+if(keys_6 & KEY_2_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 8] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 8];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 9 pressed ?
+if(keys_6 & KEY_3_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 9] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 9];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 10 pressed ?
+if(keys_6 & KEY_4_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 10] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 10];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 11 pressed ?
+if(keys_6 & KEY_5_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 11] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 11];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 12 pressed ?
+if(keys_12 & KEY_0_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 12] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 12];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 13 pressed ?
+if(keys_12 & KEY_1_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 13] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 13];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 14 pressed ?
+if(keys_12 & KEY_2_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 14] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 14];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 15 pressed ?
+if(keys_12 & KEY_3_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 15] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 15];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 16 pressed ?
+if(keys_12 & KEY_4_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 16] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 16];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 17 pressed ?
+if(keys_12 & KEY_5_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 17] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 17];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 18 pressed ?
+if(keys_18 & KEY_0_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 18] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 18];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 19 pressed ?
+if(keys_18 & KEY_1_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 19] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 19];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 20 pressed ?
+if(keys_18 & KEY_2_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 20] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 20];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 21 pressed ?
+if(keys_18 & KEY_3_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 21] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 21];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 22 pressed ?
+if(keys_18 & KEY_4_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 22] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 22];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 23 pressed ?
+if(keys_18 & KEY_5_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 23] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 23];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 24 pressed ?
+if(keys_24 & KEY_0_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 24] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 24];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 25 pressed ?
+if(keys_24 & KEY_1_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 25] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 25];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 26 pressed ?
+if(keys_24 & KEY_2_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 26] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 26];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 27 pressed ?
+if(keys_24 & KEY_3_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 27] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 27];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 28 pressed ?
+if(keys_24 & KEY_4_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 28] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 28];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 29 pressed ?
+if(keys_24 & KEY_5_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 29] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 29];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 30 pressed ?
+if(keys_30 & KEY_0_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 30] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 30];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 31 pressed ?
+if(keys_30 & KEY_1_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 31] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 31];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 32 pressed ?
+if(keys_30 & KEY_2_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 32] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 32];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 33 pressed ?
+if(keys_30 & KEY_3_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 33] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 33];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 34 pressed ?
+if(keys_30 & KEY_4_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 34] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 34];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 35 pressed ?
+if(keys_30 & KEY_5_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 35] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 35];
+analog_out_temp += getSquareWave(T);
+#endif
+}
 
-#if KEYS_NUMBER == 48
-  // Is key 36 pressed ?
-  if(keys_36 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 36] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 37 pressed ?
-  if(keys_36 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 37] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 38 pressed ?
-  if(keys_36 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 38] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 39 pressed ?
-  if(keys_36 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 39] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 40 pressed ?
-  if(keys_36 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 40] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 41 pressed ?
-  if(keys_36 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 41] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 42 pressed ?
-  if(keys_42 & KEY_0_MSK){
-  T = PERIODS[current_pitch_0 + 42] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 43 pressed ?
-  if(keys_42 & KEY_1_MSK){
-  T = PERIODS[current_pitch_0 + 43] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 44 pressed ?
-  if(keys_42 & KEY_2_MSK){
-  T = PERIODS[current_pitch_0 + 44] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 45 pressed ?
-  if(keys_42 & KEY_3_MSK){
-  T = PERIODS[current_pitch_0 + 45] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 46 pressed ?
-  if(keys_42 & KEY_4_MSK){
-  T = PERIODS[current_pitch_0 + 46] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
-  // Is key 47 pressed ?
-  if(keys_42 & KEY_5_MSK){
-  T = PERIODS[current_pitch_0 + 47] * vibrato_T_multiplier;
-  analog_out_temp += getSquareWave(T, tremolo_multiplier);
-  }
+#if KEYS_NUMBER==48
+
+// Is key 36 pressed ?
+if(keys_36 & KEY_0_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 36] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 36];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 37 pressed ?
+if(keys_36 & KEY_1_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 37] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 37];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 38 pressed ?
+if(keys_36 & KEY_2_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 38] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 38];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 39 pressed ?
+if(keys_36 & KEY_3_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 39] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 39];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 40 pressed ?
+if(keys_36 & KEY_4_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 40] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 40];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 41 pressed ?
+if(keys_36 & KEY_5_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 41] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 41];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 42 pressed ?
+if(keys_42 & KEY_0_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 42] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 42];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 43 pressed ?
+if(keys_42 & KEY_1_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 43] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 43];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 44 pressed ?
+if(keys_42 & KEY_2_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 44] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 44];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 45 pressed ?
+if(keys_42 & KEY_3_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 45] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 45];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 46 pressed ?
+if(keys_42 & KEY_4_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 46] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 46];
+analog_out_temp += getSquareWave(T);
+#endif
+}
+// Is key 47 pressed ?
+if(keys_42 & KEY_5_MSK){
+#ifdef ENABLE_TREMOLO_VIBRATO
+T = PERIODS[current_pitch_0 + 47] * vibrato_T_multiplier;
+analog_out_temp += getSquareWave(T, tremolo_multiplier);
+#else
+T = PERIODS[current_pitch_0 + 47];
+analog_out_temp += getSquareWave(T);
+#endif
+}
 #endif
 
   // Actually update the analog value
@@ -397,8 +650,10 @@ void analog_behaviour(){
   #endif
 
   while(1){
+    #ifdef ENABLE_TREMOLO_VIBRATO
     // Recover value from vibrato and tremolo pots
     read_pots();
+    #endif
 
     // Update the buttons and keys value
     read_buttons();

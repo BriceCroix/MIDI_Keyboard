@@ -582,8 +582,10 @@ void midi_behaviour(){
   SREG |= 0x80;
 
   while(1){
+    #ifdef ENABLE_TREMOLO_VIBRATO
     // Recover value from vibrato and tremolo pots
     read_pots();
+
     // Send vibrato message if necessary
     if(ADC_vibrato_flag){
       #ifndef DEBUG
@@ -610,6 +612,7 @@ void midi_behaviour(){
       // Reset flag
       ADC_tremolo_flag = 0;
     }
+    #endif
 
     // Update the buttons and keys value
     read_buttons();
