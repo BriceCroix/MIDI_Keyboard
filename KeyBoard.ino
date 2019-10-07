@@ -296,7 +296,7 @@ void read_pots(){
  * \brief Handles the settings buttons, without updating buttons_settings_last
  */
 void process_settings(){
-  if(buttons_settings & B11111100){
+  if(buttons_settings & KEYS_RELEVANT_MSK){
     // If at least one button is pressed
     if((buttons_settings & KEY_0_MSK) && !(buttons_settings_last & KEY_0_MSK)){
       // If first button was just pressed, minus an octave

@@ -653,6 +653,20 @@ void analog_behaviour(){
     #ifdef ENABLE_TREMOLO_VIBRATO
     // Recover value from vibrato and tremolo pots
     read_pots();
+
+    #ifdef DEBUG
+    if(ADC_vibrato_flag){
+      USART_SEND('v'); USART_SEND(ADC_vibrato); USART_SEND('\n');
+      // Reset flag
+      ADC_vibrato_flag = 0;
+    }
+    // Send tremolo message if necessary
+    if(ADC_tremolo_flag){
+      USART_SEND('t'); USART_SEND(ADC_tremolo); USART_SEND('\n');
+      // Reset flag
+      ADC_tremolo_flag = 0;
+    }
+    #endif
     #endif
 
     // Update the buttons and keys value
