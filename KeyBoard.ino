@@ -6,7 +6,7 @@
  */
 
  // Enables the debug functionalities
-#define DEBUG
+//#define DEBUG
 
 
 // Define the number of keys, 36 or 48
@@ -14,7 +14,7 @@
 #define KEYS_NUMBER 36
 
 // Enables the tremolo and vibrato potentiometers
-//#define ENABLE_TREMOLO_VIBRATO
+#define ENABLE_TREMOLO_VIBRATO
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -99,7 +99,7 @@ volatile int8_t pitch_0 = DEFAULT_PITCH_0;
  * \var ADC_vibrato
  * \brief Stores the value of the vibrato potentiometer
  */
-volatile uint8_t ADC_vibrato = 128;
+volatile uint8_t ADC_vibrato = 64;
 
 
 /**
@@ -113,7 +113,7 @@ volatile uint8_t ADC_vibrato_flag = 0;
  * \var ADC_tremolo
  * \brief Stores the value of the tremolo potentiometer
  */
-volatile uint8_t ADC_tremolo = 128;
+volatile uint8_t ADC_tremolo = 64;
 
 
 /**
@@ -269,15 +269,17 @@ void read_pots(){
     if(ADMUX & (1<<MUX0)){
       // Channel 7
       // Only act when there is a change
-      if(ADC_vibrato != ADCH){
-        ADC_vibrato = ADCH;
+      if(ADC_vibrato != (ADCH >> 1)){
+        // Precision is 7 bits
+        ADC_vibrato = ADCH >> 1;
         ADC_vibrato_flag = 1;
       }
     }else{
       // Channel 6
       // Only act when there is a change
-      if(ADC_tremolo != ADCH){
-        ADC_tremolo = ADCH;
+      if(ADC_tremolo != (ADCH >> 1)){
+        // Precision is 7 bits
+        ADC_tremolo = ADCH >> 1;
         ADC_tremolo_flag = 1;
       }
     }

@@ -590,8 +590,8 @@ void midi_behaviour(){
     // Send vibrato message if necessary
     if(ADC_vibrato_flag){
       USART_SEND(MIDI_MSG_PITCH_BEND); // Indicates a pitch change
-      USART_SEND(ADC_vibrato<<7); // LSByte of pitch change, only LSBit of ADC value
-      USART_SEND(ADC_vibrato>>1); // MSByte of pitch change, 7 MSBits of ADC value
+      USART_SEND(0x00); // LSByte of pitch change
+      USART_SEND(ADC_vibrato); // MSByte of pitch change, 7 MSBits of ADC value
       // Reset flag
       ADC_vibrato_flag = 0;
     }
