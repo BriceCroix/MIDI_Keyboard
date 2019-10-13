@@ -328,10 +328,6 @@ void process_settings(){
       // If fifth button was just pressed, reset pitch_0 to closest C
       pitch_0 -= pitch_0 % OCTAVE;
     }
-    if((buttons_settings & KEY_5_MSK) && !(buttons_settings_last & KEY_5_MSK)){
-      // If sixth button was just pressed, reset pitch_0
-      pitch_0 = DEFAULT_PITCH_0;
-    }
   }
 }
 
