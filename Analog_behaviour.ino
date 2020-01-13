@@ -1,5 +1,4 @@
 /**
- * \file Analog_behaviour.ino
  * \brief code for the keyboard analog behaviour
  * \author Brice Croix
  */
@@ -16,7 +15,6 @@
 
 
 /**
- * \var PERIODS
  * \brief Each period in us from C0 to B8
  */
 const uint16_t PERIODS[] = {
@@ -33,28 +31,21 @@ const uint16_t PERIODS[] = {
 
 
 /**
- * \var t
  * \brief time in micro second
  */
 volatile uint64_t t = 0;
 
-
 /**
- * \var analog_out
  * \brief the analog value to write on the analog output
  */
 volatile uint16_t analog_out = 0;
 
-
 /**
- * \var get_wave_shape_ptr
  * \brief a function pointer to the wave function to use to compute analog output
  */
 uint8_t (*get_wave_shape_ptr)(uint16_t period, uint8_t amplitude) = &getSquareWave;
 
-
 /**
- * \fn void init_timer_1()
  * \brief Sets timer 1 in condition to generate PWM signal
  */
 void init_timer_1(){
@@ -74,7 +65,7 @@ void init_timer_1(){
   TCCR1A |= 1<<WGM11; // Set WGM11 to 1
   TCCR1B |= 1<<WGM13 | 1<<WGM12; // Set WGM13:12 to 1
   // In this mode the Auto-Reload value (TOP, or ARR for a STM32) is in the Input Capture Register
-  ICR1 = 0x01FF; // Sampling Frequency = 31250 Hz with 9 bits resolution
+  ICR1 = 0x01FF; // 512 => Sampling Frequency = 31250 Hz with 9 bits resolution
 
   // Connect OC1A to pin PB1 in non-inverting PWM mode, cf p108
   TCCR1A &= ~0xF0;
@@ -90,7 +81,6 @@ void init_timer_1(){
 
 
 /**
- * \fn ISR(TIMER1_OVF_vect)
  * \brief interruption code when an ovf occurs on timer 1
  */
 ISR(TIMER1_OVF_vect){
@@ -104,7 +94,12 @@ ISR(TIMER1_OVF_vect){
   setAnalogOut();
 }
 
-
+/**
+ * \brief computes the value of a square wave at time t
+ * \param[in] period period of the wave to compute, in us
+ * \param[in] amplitude amplitude of the wave to compute
+ * \return value of wave to compute
+ */
 uint8_t getSquareWave(uint16_t period, uint8_t amplitude){
   if(t%period < (period>>1)){
     //High
@@ -115,7 +110,12 @@ uint8_t getSquareWave(uint16_t period, uint8_t amplitude){
   }
 }
 
-
+/**
+ * \brief computes the value of a triangle wave at time t
+ * \param[in] period period of the wave to compute, in us
+ * \param[in] amplitude amplitude of the wave to compute
+ * \return value of wave to compute
+ */
 uint8_t getTriangleWave(uint16_t period, uint8_t amplitude){
   uint16_t half_period = period>>1;
   if ((t%period) < half_period){
@@ -125,14 +125,18 @@ uint8_t getTriangleWave(uint16_t period, uint8_t amplitude){
   }
 }
 
-
+/**
+ * \brief computes the value of a rising saw wave at time t
+ * \param[in] period period of the wave to compute, in us
+ * \param[in] amplitude amplitude of the wave to compute
+ * \return value of wave to compute
+ */
 uint8_t getSawWave(uint16_t period, uint8_t amplitude){
   return amplitude * (float)(t%period) / period;
 }
 
 
 /**
- * \fn void setAnalogOut()
  * \brief Sets the analog_out value according to the keys state.
  */
 void setAnalogOut(){
@@ -407,7 +411,6 @@ void setAnalogOut(){
 
 
 /**
- * \fn void analog_behaviour()
  * \brief sets the arduino in order to output analog signal
  */
 void analog_behaviour(){

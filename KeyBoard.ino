@@ -18,7 +18,6 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "binary.h"
 
 
 // The no-operation function as defined in assembly language
@@ -48,10 +47,10 @@
 #define KEY_3_MSK 0x20
 #define KEY_4_MSK 0x40
 #define KEY_5_MSK 0x80
-#define KEYS_RELEVANT_MSK B11111100
+#define KEYS_RELEVANT_MSK 0xFC
 
 // Macro function to send a byte, waits for buffer to be empty
-#define USART_SEND(byte) while(!(UCSR0A & B00100000)); UDR0 = byte
+#define USART_SEND(byte) while(!(UCSR0A & 0x20)); UDR0 = byte
 
 /**
  * \var keys_0
@@ -88,7 +87,6 @@ volatile uint8_t buttons_settings_last = 0;
 
 
 /**
- * \var pitch_0
  * \brief index of the lowest key, 0 for C0, 2 for D0, 12 for C1...
  */
 volatile int8_t pitch_0 = DEFAULT_PITCH_0;
@@ -96,28 +94,21 @@ volatile int8_t pitch_0 = DEFAULT_PITCH_0;
 
 #ifdef ENABLE_TREMOLO_VIBRATO
 /**
- * \var ADC_vibrato
  * \brief Stores the value of the vibrato potentiometer
  */
 volatile uint8_t ADC_vibrato = 64;
 
-
 /**
- * \var ADC_vibrato_flag
  * \brief A flag to indicate that the ADC vibrato value has been updated
  */
 volatile uint8_t ADC_vibrato_flag = 0;
 
-
 /**
- * \var ADC_tremolo
  * \brief Stores the value of the tremolo potentiometer
  */
 volatile uint8_t ADC_tremolo = 64;
 
-
 /**
- * \var ADC_tremolo_flag
  * \brief A flag to indicate that the ADC tremolo value has been updated
  */
 volatile uint8_t ADC_tremolo_flag = 0;
@@ -125,7 +116,6 @@ volatile uint8_t ADC_tremolo_flag = 0;
 
 
 /**
- * \fn void init_pins()
  * \brief Sets pins PD7:2 as pulled-up inputs and pins PB5:0, PC3:0 as outputs
  */
 void init_pins(){
@@ -135,25 +125,24 @@ void init_pins(){
   // PortD 2:7 as input for all buttons, this will allow to get all values in one instruction
   DDRD &= ~(1<<DDD2 | 1<<DDD3 | 1<<DDD4 | 1<<DDD5 | 1<<DDD6 | 1<<DDD7);
   // Put pins PD2:7 to pull-up
-  PORTD |= B11111100;
+  PORTD |= 0xFC;
 
   // PWM output OCA1, which is on PB1, aka Pin9
   // PortB 0 and 2:5 as output for buttons from Keys 0 to 23
   // Built-in led also on PB5 as output
   DDRB |= (1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5);
   // Turning on all outputs for now, except LED
-  PORTB |= B00011101;
+  PORTB |= 0x1D;
 
   // PortC 0:3 as output for keys 24 to 42 , PC4 for settings buttons and PC5 for LED
   DDRC |= (1<<DDC0 | 1<<DDC1 | 1<<DDC2 | 1<<DDC3 | 1<<DDC4 | 1<<DDC5 );
   // Turning on all outputs for now, except LED
-  PORTC |= B00011111;
+  PORTC |= 0x1F;
 }
 
 
 #ifdef ENABLE_TREMOLO_VIBRATO
 /**
- * \fn void init_adc()
  * \brief Enables the ADC with no ADC clock prescaler
  */
  void init_adc(){
@@ -180,19 +169,7 @@ void init_pins(){
  }
 #endif
 
-
 /**
- * \fn disable_ide_stuff()
- * \brief Disables some default functionnalities provided by Arduino IDE
- */
-void disable_ide_stuff(){
-  //TODO
-  //Disable timer_0, which interrupts to provide delay and millis functions
-}
-
-
-/**
- * \fn void read_buttons()
  * \brief update the values of the 36 keys and of the 12 buttons
  */
 void read_buttons(){
@@ -259,7 +236,6 @@ void read_buttons(){
 
 #ifdef ENABLE_TREMOLO_VIBRATO
 /**
- * \fn void read_pots
  * \brief update, if available, the value of potentiometers
  */
 void read_pots(){
@@ -294,7 +270,6 @@ void read_pots(){
 
 
 /**
- * \fn void process_settings()
  * \brief Handles the settings buttons, without updating buttons_settings_last
  */
 void process_settings(){
@@ -333,14 +308,13 @@ void process_settings(){
 
 
 /**
- * \fn void main()
- * \brief main function to loop over and over endlessly
+ * \brief main function containing the choice between analog and MIDI mode
  */
 int main(){
-  // Disable interrupts while initializing, cf p11
+  // Disable interrupts while initializing, cf p11 doc
   SREG &= ~0x80;
   init_pins();
-  
+
   #ifdef ENABLE_TREMOLO_VIBRATO
   init_adc();
   #endif
