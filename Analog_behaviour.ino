@@ -4,10 +4,10 @@
  */
 
 
-// Minimum duty value for analog output, notice PWM_NOTE_AMP/2
-#define PWM_MIN 32
 // The analog amplitude for one note, defining how many notes can be played at once, here 8 notes because 8*64 = 512
 #define PWM_NOTE_AMP 64
+// Minimum duty value for analog output, = PWM_NOTE_AMP/2
+#define PWM_MIN ((unsigned int)PWM_NOTE_AMP >> 1)
 // Sample frequency in Hz
 #define SAMPLE_FREQUENCY 31250
 // Sample time in micro second

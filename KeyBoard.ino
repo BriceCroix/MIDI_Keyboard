@@ -7,13 +7,16 @@
 // Enables the debug functionalities
 //#define DEBUG
 
-
+/********** END-USER, PLEASE ADJUST TO FIT YOUR NEEDS **********/
 // Define the number of keys, between 12 or 48
 #define KEYS_NUMBER 36
+/***************************************************************/
 
+/********** END-USER, PLEASE COMMENT OR UNCOMMENT TO FIT YOUR NEEDS **********/
 // Enables the tremolo and vibrato potentiometers
 #define ENABLE_TREMOLO
 #define ENABLE_VIBRATO
+/*****************************************************************************/
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -28,8 +31,10 @@
 // Number of available notes
 #define NOTE_NUMBER 108
 
-// Initial value of pitch_0
-#define DEFAULT_PITCH_0 48;
+/********** END-USER, PLEASE ADJUST TO FIT YOUR PREFERENCES **********/
+// Initial value of pitch_0, 0 for C0, 12 for C1, 24 for C2, 36 for C3 ...
+#define DEFAULT_PITCH_0 36;
+/*********************************************************************/
 
 // Max value of the pitch_0 variable, depending on the number of keys
 #define MAX_PITCH_0 (NOTE_NUMBER - KEYS_NUMBER)
