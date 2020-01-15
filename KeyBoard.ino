@@ -4,7 +4,7 @@
  * \date june 25 of 2019
  */
 
- // Enables the debug functionalities
+// Enables the debug functionalities
 //#define DEBUG
 
 
@@ -12,7 +12,8 @@
 #define KEYS_NUMBER 36
 
 // Enables the tremolo and vibrato potentiometers
-#define ENABLE_TREMOLO_VIBRATO
+#define ENABLE_TREMOLO
+#define ENABLE_VIBRATO
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -91,7 +92,7 @@ volatile uint8_t buttons_settings_last = 0;
 volatile int8_t pitch_0 = DEFAULT_PITCH_0;
 
 
-#ifdef ENABLE_TREMOLO_VIBRATO
+#ifdef ENABLE_VIBRATO
 /**
  * \brief Stores the value of the vibrato potentiometer
  */
@@ -101,7 +102,9 @@ volatile uint8_t ADC_vibrato = 64;
  * \brief A flag to indicate that the ADC vibrato value has been updated
  */
 volatile uint8_t ADC_vibrato_flag = 0;
+#endif
 
+#ifdef ENABLE_TREMOLO
 /**
  * \brief Stores the value of the tremolo potentiometer
  */
@@ -159,9 +162,9 @@ void init_pins(){
 }
 
 
-#ifdef ENABLE_TREMOLO_VIBRATO
+#if defined ENABLE_VIBRATO || defined ENABLE_TREMOLO
 /**
- * \brief Enables the ADC with no ADC clock prescaler
+ * \brief Enables the ADC for volume and pitch bends
  */
  void init_adc(){
    // Reference is AVcc = 5V
@@ -174,8 +177,12 @@ void init_pins(){
    ADCSRA &= ~((1<<ADPS0) | (1<<ADPS1) | (1<<ADPS2) );
    ADCSRA |= (1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
 
-   // For now ADC connected to pin A7
-   ADMUX |= (1<<MUX2)|(1<<MUX1)|(1<<MUX0);
+   // For now ADC connected to pin A6
+   ADMUX |= (1<<MUX2)|(1<<MUX1);
+   #ifdef ENABLE_VIBRATO
+   // Connect to A7
+   ADMUX |= (1<<MUX0);
+   #endif
 
    // start single conversion by writing ’1′ to ADSC
    //Useful since first conversion is longer
@@ -260,10 +267,15 @@ void read_buttons(){
 }
 
 
-#ifdef ENABLE_TREMOLO_VIBRATO
+#if defined ENABLE_VIBRATO || defined ENABLE_TREMOLO
 /**
  * \brief update, if available, the value of potentiometers
  */
+void read_pots();
+#endif
+
+// switch read_pots implementation
+#if defined ENABLE_VIBRATO && defined ENABLE_TREMOLO
 void read_pots(){
   // If no ADC conversion is running
   if( !(ADCSRA & (1<<ADSC)) ){
@@ -288,6 +300,38 @@ void read_pots(){
     // Change channel
     ADMUX = ADMUX ^ (1<<MUX0);
 
+    // Start new conversion
+    ADCSRA |= (1<<ADSC);
+  }
+}
+
+#elif defined ENABLE_VIBRATO && not defined ENABLE_TREMOLO
+void read_pots(){
+  // If no ADC conversion is running
+  if( !(ADCSRA & (1<<ADSC)) ){
+      // Channel 7
+      // Only act when there is a change
+      if(ADC_vibrato != (ADCH >> 1)){
+        // Precision is 7 bits
+        ADC_vibrato = ADCH >> 1;
+        ADC_vibrato_flag = 1;
+      }
+    // Start new conversion
+    ADCSRA |= (1<<ADSC);
+  }
+}
+
+#elif not defined ENABLE_VIBRATO && defined ENABLE_TREMOLO
+void read_pots(){
+  // If no ADC conversion is running
+  if( !(ADCSRA & (1<<ADSC)) ){
+      // Channel 6
+      // Only act when there is a change
+      if(ADC_tremolo != (ADCH >> 1)){
+        // Precision is 7 bits
+        ADC_tremolo = ADCH >> 1;
+        ADC_tremolo_flag = 1;
+      }
     // Start new conversion
     ADCSRA |= (1<<ADSC);
   }
@@ -341,7 +385,7 @@ int main(){
   SREG &= ~0x80;
   init_pins();
 
-  #ifdef ENABLE_TREMOLO_VIBRATO
+  #if defined ENABLE_VIBRATO || defined ENABLE_TREMOLO
   init_adc();
   #endif
 

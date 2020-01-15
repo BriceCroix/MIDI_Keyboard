@@ -253,7 +253,7 @@ void process_keys_MIDI(){
     }
   }
   #endif
-  
+
   #if KEYS_NUMBER >= 18
   // Is there a change in keys 18 to 23?
   if(keys_18 != keys_18_last){
@@ -589,10 +589,11 @@ void midi_behaviour(){
   SREG |= 0x80;
 
   while(1){
-    #ifdef ENABLE_TREMOLO_VIBRATO
+    #if defined ENABLE_VIBRATO || defined ENABLE_TREMOLO
     // Recover value from vibrato and tremolo pots
     read_pots();
-
+    #endif
+    #ifdef ENABLE_VIBRATO
     // Send vibrato message if necessary
     if(ADC_vibrato_flag){
       USART_SEND(MIDI_MSG_PITCH_BEND); // Indicates a pitch change
@@ -601,6 +602,8 @@ void midi_behaviour(){
       // Reset flag
       ADC_vibrato_flag = 0;
     }
+    #endif
+    #ifdef ENABLE_TREMOLO
     // Send tremolo message if necessary
     if(ADC_tremolo_flag){
       USART_SEND(MIDI_MSG_CONTROLLER_CHANGE); // Controller change
