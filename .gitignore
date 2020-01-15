@@ -1,0 +1,3 @@
+# Ignore Kicad cache and backup files
+*cache*
+*.bak

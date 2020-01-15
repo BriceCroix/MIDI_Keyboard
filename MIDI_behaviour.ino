@@ -1,5 +1,4 @@
 /**
- * \file MIDI_behaviour.ino
  * \brief code for the keyboard MIDI behaviour
  * \author Brice Croix
  */
@@ -18,10 +17,10 @@
 #define MIDI_MSG_PITCH_BEND 0xE0
 
 
-#if 0
-/**
+
+/*
  * \brief MIDI code for each note, this array is not usefull anymore. Keeping it in code for information purpose.
- */
+ *
 const uint8_t MIDI_NOTES[] = {
   0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, //C0 to B0
   0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, //C1 to B1
@@ -33,7 +32,7 @@ const uint8_t MIDI_NOTES[] = {
   0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a, 0x6b, //C7 to B7
   0x6c, 0x6d, 0x6e, 0x6f, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77  //C8 to B8
 };
-#endif
+*/
 
 /**
  * \brief initialize the USART communication protocol
@@ -195,6 +194,7 @@ void process_keys_MIDI(){
     }
   }
 
+  #if KEYS_NUMBER >= 12
   // Is there a change in keys 12 to 17?
   if(keys_12 != keys_12_last){
     // Is key 12 just being pressed ?
@@ -252,7 +252,9 @@ void process_keys_MIDI(){
       note_OFF_queue_len += 1;
     }
   }
-
+  #endif
+  
+  #if KEYS_NUMBER >= 18
   // Is there a change in keys 18 to 23?
   if(keys_18 != keys_18_last){
     // Is key 18 just being pressed ?
@@ -310,7 +312,9 @@ void process_keys_MIDI(){
       note_OFF_queue_len += 1;
     }
   }
+  #endif
 
+  #if KEYS_NUMBER >= 24
   // Is there a change in keys 24 to 29?
   if(keys_24 != keys_24_last){
     // Is key 24 just being pressed ?
@@ -368,7 +372,9 @@ void process_keys_MIDI(){
       note_OFF_queue_len += 1;
     }
   }
+  #endif
 
+  #if KEYS_NUMBER >= 30
   // Is there a change in keys 30 to 35?
   if(keys_30 != keys_30_last){
     // Is key 30 just being pressed ?
@@ -426,8 +432,9 @@ void process_keys_MIDI(){
       note_OFF_queue_len += 1;
     }
   }
+  #endif
 
-#if KEYS_NUMBER == 48
+  #if KEYS_NUMBER >= 36
   // Is there a change in keys 36 to 41?
   if(keys_36 != keys_36_last){
     // Is key 36 just being pressed ?
@@ -485,7 +492,9 @@ void process_keys_MIDI(){
       note_OFF_queue_len += 1;
     }
   }
+  #endif
 
+  #if KEYS_NUMBER >= 42
   // Is there a change in keys 42 to 47?
   if(keys_42 != keys_42_last){
     // Is key 42 just being pressed ?
@@ -543,7 +552,7 @@ void process_keys_MIDI(){
       note_OFF_queue_len += 1;
     }
   }
-#endif
+  #endif
 
   // Actually send midi note ON and OFF data
 
@@ -615,13 +624,23 @@ void midi_behaviour(){
     // Keep previous value of keys
     keys_0_last = keys_0;
     keys_6_last = keys_6;
+    #if KEYS_NUMBER >= 12
     keys_12_last = keys_12;
+    #endif
+    #if KEYS_NUMBER >= 18
     keys_18_last = keys_18;
+    #endif
+    #if KEYS_NUMBER >= 24
     keys_24_last = keys_24;
+    #endif
+    #if KEYS_NUMBER >= 30
     keys_30_last = keys_30;
-#if KEYS_NUMBER == 48
+    #endif
+    #if KEYS_NUMBER >= 36
     keys_36_last = keys_36;
+    #endif
+    #if KEYS_NUMBER >= 42
     keys_42_last = keys_42;
-#endif
+    #endif
   }
 }

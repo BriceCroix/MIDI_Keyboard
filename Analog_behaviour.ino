@@ -220,6 +220,7 @@ void setAnalogOut(){
   T = PERIODS[current_pitch_0 + 11] * vibrato_T_multiplier;
   analog_out_temp += (*get_wave_shape_ptr)(T, amplitude);
   }
+  #if KEYS_NUMBER >= 12
   // Is key 12 pressed ?
   if(keys_12 & KEY_0_MSK){
   T = PERIODS[current_pitch_0 + 12] * vibrato_T_multiplier;
@@ -250,6 +251,8 @@ void setAnalogOut(){
   T = PERIODS[current_pitch_0 + 17] * vibrato_T_multiplier;
   analog_out_temp += (*get_wave_shape_ptr)(T, amplitude);
   }
+  #endif
+  #if KEYS_NUMBER >= 18
   // Is key 18 pressed ?
   if(keys_18 & KEY_0_MSK){
   T = PERIODS[current_pitch_0 + 18] * vibrato_T_multiplier;
@@ -280,6 +283,8 @@ void setAnalogOut(){
   T = PERIODS[current_pitch_0 + 23] * vibrato_T_multiplier;
   analog_out_temp += (*get_wave_shape_ptr)(T, amplitude);
   }
+  #endif
+  #if KEYS_NUMBER >= 24
   // Is key 24 pressed ?
   if(keys_24 & KEY_0_MSK){
   T = PERIODS[current_pitch_0 + 24] * vibrato_T_multiplier;
@@ -310,6 +315,8 @@ void setAnalogOut(){
   T = PERIODS[current_pitch_0 + 29] * vibrato_T_multiplier;
   analog_out_temp += (*get_wave_shape_ptr)(T, amplitude);
   }
+  #endif
+  #if KEYS_NUMBER >= 30
   // Is key 30 pressed ?
   if(keys_30 & KEY_0_MSK){
   T = PERIODS[current_pitch_0 + 30] * vibrato_T_multiplier;
@@ -340,9 +347,8 @@ void setAnalogOut(){
   T = PERIODS[current_pitch_0 + 35] * vibrato_T_multiplier;
   analog_out_temp += (*get_wave_shape_ptr)(T, amplitude);
   }
-
-  #if KEYS_NUMBER == 48
-
+  #endif
+  #if KEYS_NUMBER >= 36
   // Is key 36 pressed ?
   if(keys_36 & KEY_0_MSK){
   T = PERIODS[current_pitch_0 + 36] * vibrato_T_multiplier;
@@ -373,6 +379,8 @@ void setAnalogOut(){
   T = PERIODS[current_pitch_0 + 41] * vibrato_T_multiplier;
   analog_out_temp += (*get_wave_shape_ptr)(T, amplitude);
   }
+  #endif
+  #if KEYS_NUMBER >= 42
   // Is key 42 pressed ?
   if(keys_42 & KEY_0_MSK){
   T = PERIODS[current_pitch_0 + 42] * vibrato_T_multiplier;
@@ -403,7 +411,7 @@ void setAnalogOut(){
   T = PERIODS[current_pitch_0 + 47] * vibrato_T_multiplier;
   analog_out_temp += (*get_wave_shape_ptr)(T, amplitude);
   }
-#endif
+  #endif
 
   // Actually update the analog value
   analog_out = analog_out_temp;
@@ -485,37 +493,47 @@ void analog_behaviour(){
     if(keys_6 & KEY_3_MSK){ USART_SEND('k'); USART_SEND('9'); USART_SEND('\n');}
     if(keys_6 & KEY_4_MSK){ USART_SEND('k'); USART_SEND('1'); USART_SEND('0'); USART_SEND('\n');}
     if(keys_6 & KEY_5_MSK){ USART_SEND('k'); USART_SEND('1'); USART_SEND('1'); USART_SEND('\n');}
+    #if KEYS_NUMBER >= 12
     if(keys_12 & KEY_0_MSK){ USART_SEND('k'); USART_SEND('1'); USART_SEND('2'); USART_SEND('\n');}
     if(keys_12 & KEY_1_MSK){ USART_SEND('k'); USART_SEND('1'); USART_SEND('3'); USART_SEND('\n');}
     if(keys_12 & KEY_2_MSK){ USART_SEND('k'); USART_SEND('1'); USART_SEND('4'); USART_SEND('\n');}
     if(keys_12 & KEY_3_MSK){ USART_SEND('k'); USART_SEND('1'); USART_SEND('5'); USART_SEND('\n');}
     if(keys_12 & KEY_4_MSK){ USART_SEND('k'); USART_SEND('1'); USART_SEND('6'); USART_SEND('\n');}
     if(keys_12 & KEY_5_MSK){ USART_SEND('k'); USART_SEND('1'); USART_SEND('7'); USART_SEND('\n');}
+    #endif
+    #if KEYS_NUMBER >= 18
     if(keys_18 & KEY_0_MSK){ USART_SEND('k'); USART_SEND('1'); USART_SEND('8'); USART_SEND('\n');}
     if(keys_18 & KEY_1_MSK){ USART_SEND('k'); USART_SEND('1'); USART_SEND('9'); USART_SEND('\n');}
     if(keys_18 & KEY_2_MSK){ USART_SEND('k'); USART_SEND('2'); USART_SEND('0'); USART_SEND('\n');}
     if(keys_18 & KEY_3_MSK){ USART_SEND('k'); USART_SEND('2'); USART_SEND('1'); USART_SEND('\n');}
     if(keys_18 & KEY_4_MSK){ USART_SEND('k'); USART_SEND('2'); USART_SEND('2'); USART_SEND('\n');}
     if(keys_18 & KEY_5_MSK){ USART_SEND('k'); USART_SEND('2'); USART_SEND('3'); USART_SEND('\n');}
+    #endif
+    #if KEYS_NUMBER >= 24
     if(keys_24 & KEY_1_MSK){ USART_SEND('k'); USART_SEND('2'); USART_SEND('4'); USART_SEND('\n');}
     if(keys_24 & KEY_0_MSK){ USART_SEND('k'); USART_SEND('2'); USART_SEND('5'); USART_SEND('\n');}
     if(keys_24 & KEY_2_MSK){ USART_SEND('k'); USART_SEND('2'); USART_SEND('6'); USART_SEND('\n');}
     if(keys_24 & KEY_3_MSK){ USART_SEND('k'); USART_SEND('2'); USART_SEND('7'); USART_SEND('\n');}
     if(keys_24 & KEY_4_MSK){ USART_SEND('k'); USART_SEND('2'); USART_SEND('8'); USART_SEND('\n');}
     if(keys_24 & KEY_5_MSK){ USART_SEND('k'); USART_SEND('2'); USART_SEND('9'); USART_SEND('\n');}
+    #endif
+    #if KEYS_NUMBER >= 30
     if(keys_30 & KEY_0_MSK){ USART_SEND('k'); USART_SEND('3'); USART_SEND('0'); USART_SEND('\n');}
     if(keys_30 & KEY_1_MSK){ USART_SEND('k'); USART_SEND('3'); USART_SEND('1'); USART_SEND('\n');}
     if(keys_30 & KEY_2_MSK){ USART_SEND('k'); USART_SEND('3'); USART_SEND('2'); USART_SEND('\n');}
     if(keys_30 & KEY_3_MSK){ USART_SEND('k'); USART_SEND('3'); USART_SEND('3'); USART_SEND('\n');}
     if(keys_30 & KEY_4_MSK){ USART_SEND('k'); USART_SEND('3'); USART_SEND('4'); USART_SEND('\n');}
     if(keys_30 & KEY_5_MSK){ USART_SEND('k'); USART_SEND('3'); USART_SEND('5'); USART_SEND('\n');}
-    #if KEYS_NUMBER==48
+    #endif
+    #if KEYS_NUMBER >= 36
     if(keys_36 & KEY_0_MSK){ USART_SEND('k'); USART_SEND('3'); USART_SEND('6'); USART_SEND('\n');}
     if(keys_36 & KEY_1_MSK){ USART_SEND('k'); USART_SEND('3'); USART_SEND('7'); USART_SEND('\n');}
     if(keys_36 & KEY_2_MSK){ USART_SEND('k'); USART_SEND('3'); USART_SEND('8'); USART_SEND('\n');}
     if(keys_36 & KEY_3_MSK){ USART_SEND('k'); USART_SEND('3'); USART_SEND('9'); USART_SEND('\n');}
     if(keys_36 & KEY_4_MSK){ USART_SEND('k'); USART_SEND('4'); USART_SEND('0'); USART_SEND('\n');}
     if(keys_36 & KEY_5_MSK){ USART_SEND('k'); USART_SEND('4'); USART_SEND('1'); USART_SEND('\n');}
+    #endif
+    #if KEYS_NUMBER >= 42
     if(keys_42 & KEY_0_MSK){ USART_SEND('k'); USART_SEND('4'); USART_SEND('2'); USART_SEND('\n');}
     if(keys_42 & KEY_1_MSK){ USART_SEND('k'); USART_SEND('4'); USART_SEND('3'); USART_SEND('\n');}
     if(keys_42 & KEY_2_MSK){ USART_SEND('k'); USART_SEND('4'); USART_SEND('4'); USART_SEND('\n');}

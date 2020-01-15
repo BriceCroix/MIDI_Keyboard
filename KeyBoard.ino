@@ -1,5 +1,4 @@
 /**
- * \file KeyBoard.ino
  * \brief This file aims at providing efficient code in order to create music thanks to MIDI standart associated with analog signal.
  * \author Brice Croix
  * \date june 25 of 2019
@@ -9,8 +8,7 @@
 //#define DEBUG
 
 
-// Define the number of keys, 36 or 48
-//#define KEYS_NUMBER 48
+// Define the number of keys, between 12 or 48
 #define KEYS_NUMBER 36
 
 // Enables the tremolo and vibrato potentiometers
@@ -33,12 +31,7 @@
 #define DEFAULT_PITCH_0 48;
 
 // Max value of the pitch_0 variable, depending on the number of keys
-#if KEYS_NUMBER == 48
-#define MAX_PITCH_0 60
-#endif
-#if KEYS_NUMBER == 36
-#define MAX_PITCH_0 72
-#endif
+#define MAX_PITCH_0 (NOTE_NUMBER - KEYS_NUMBER)
 
 // Masks to check keys level in a key group
 #define KEY_0_MSK 0x04
@@ -49,42 +42,48 @@
 #define KEY_5_MSK 0x80
 #define KEYS_RELEVANT_MSK 0xFC
 
-// Macro function to send a byte, waits for buffer to be empty
+/**
+ * \brief Macro function to send a byte, waits for buffer to be empty
+ */
 #define USART_SEND(byte) while(!(UCSR0A & 0x20)); UDR0 = byte
 
 /**
- * \var keys_0
  * \brief Stores state of keys 0 to 5, same goes for key_6, key_12 etc. Only the 6 MSB are relevant on these variables. [k5,k4,k3,k2,k1,k0,xx,xx]
  */
 volatile uint8_t keys_0 = 0;
-volatile uint8_t keys_6 = 0;
-volatile uint8_t keys_12 = 0;
-volatile uint8_t keys_18 = 0;
-volatile uint8_t keys_24 = 0;
-volatile uint8_t keys_30 = 0;
-#if KEYS_NUMBER == 48
-volatile uint8_t keys_36 = 0;
-volatile uint8_t keys_42 = 0;
-#endif
-volatile uint8_t buttons_settings = 0;
-
 
 /**
- * \var keys_0_last
  * \brief stores the state of the keys at last sample
  */
 volatile uint8_t keys_0_last = 0;
+volatile uint8_t keys_6 = 0;
 volatile uint8_t keys_6_last = 0;
+#if KEYS_NUMBER >= 12
+volatile uint8_t keys_12 = 0;
 volatile uint8_t keys_12_last = 0;
+#endif
+#if KEYS_NUMBER >= 18
+volatile uint8_t keys_18 = 0;
 volatile uint8_t keys_18_last = 0;
+#endif
+#if KEYS_NUMBER >= 24
+volatile uint8_t keys_24 = 0;
 volatile uint8_t keys_24_last = 0;
+#endif
+#if KEYS_NUMBER >= 30
+volatile uint8_t keys_30 = 0;
 volatile uint8_t keys_30_last = 0;
-#if KEYS_NUMBER == 48
+#endif
+#if KEYS_NUMBER >= 36
+volatile uint8_t keys_36 = 0;
 volatile uint8_t keys_36_last = 0;
+#endif
+#if KEYS_NUMBER >= 42
+volatile uint8_t keys_42 = 0;
 volatile uint8_t keys_42_last = 0;
 #endif
+volatile uint8_t buttons_settings = 0;
 volatile uint8_t buttons_settings_last = 0;
-
 
 /**
  * \brief index of the lowest key, 0 for C0, 2 for D0, 12 for C1...
@@ -130,12 +129,31 @@ void init_pins(){
   // PWM output OCA1, which is on PB1, aka Pin9
   // PortB 0 and 2:5 as output for buttons from Keys 0 to 23
   // Built-in led also on PB5 as output
-  DDRB |= (1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB3 | 1<<DDB4 | 1<<DDB5);
+  DDRB |= (1<<DDB0 | 1<<DDB1 | 1<<DDB2 | 1<<DDB5);
+  #if KEYS_NUMBER >= 12
+  DDRB |= 1<<DDB3;
+  #endif
+  #if KEYS_NUMBER >= 18
+  DDRB |= 1<<DDB3;
+  #endif
   // Turning on all outputs for now, except LED
   PORTB |= 0x1D;
 
-  // PortC 0:3 as output for keys 24 to 42 , PC4 for settings buttons and PC5 for LED
-  DDRC |= (1<<DDC0 | 1<<DDC1 | 1<<DDC2 | 1<<DDC3 | 1<<DDC4 | 1<<DDC5 );
+  // PortC 0:3 as output for keys 24 to 42
+  #if KEYS_NUMBER >= 24
+  DDRC |= 1<<DDC0;
+  #endif
+  #if KEYS_NUMBER >= 30
+  DDRC |= 1<<DDC1;
+  #endif
+  #if KEYS_NUMBER >= 36
+  DDRC |= 1<<DDC2;
+  #endif
+  #if KEYS_NUMBER >= 42
+  DDRC |= 1<<DDC3;
+  #endif
+  // PC4 for settings buttons and PC5 for LED as outputs
+  DDRC |= (1<<DDC4 | 1<<DDC5 );
   // Turning on all outputs for now, except LED
   PORTC |= 0x1F;
 }
@@ -170,7 +188,7 @@ void init_pins(){
 #endif
 
 /**
- * \brief update the values of the 36 keys and of the 12 buttons
+ * \brief update the values of all keys and option buttons
  */
 void read_buttons(){
   // Checking keys 0:5 by setting PB0 to 0, a no_operation is required for sync, see datasheet p60
@@ -185,46 +203,54 @@ void read_buttons(){
   keys_6 = ~(PIND);
   keys_6 &= KEYS_RELEVANT_MSK;
   PORTB |= 0x04;
+  #if KEYS_NUMBER >= 12
   // Checking keys 12:17 by setting PB3 to 0
   PORTB &= ~0x08;
   nop();
   keys_12 = ~(PIND);
   keys_12 &= KEYS_RELEVANT_MSK;
   PORTB |= 0x08;
+  #endif
+  #if KEYS_NUMBER >= 18
   // Checking keys 18:23 by setting PB4 to 0
   PORTB &= ~0x10;
   nop();
   keys_18 = ~(PIND);
   keys_18 &= KEYS_RELEVANT_MSK;
   PORTB |= 0x10;
+  #endif
+  #if KEYS_NUMBER >= 24
   // Checking keys 24:29 by setting PC0 to 0
   PORTC &= ~0x01;
   nop();
   keys_24 = ~(PIND);
   keys_24 &= KEYS_RELEVANT_MSK;
   PORTC |= 0x01;
+  #endif
+  #if KEYS_NUMBER >= 30
   // Checking keys 30:35 by setting PC1 to 0
   PORTC &= ~0x02;
   nop();
   keys_30 = ~(PIND);
   keys_30 &= KEYS_RELEVANT_MSK;
   PORTC |= 0x02;
-
-#if KEYS_NUMBER == 48
+  #endif
+  #if KEYS_NUMBER >= 36
   // Checking keys 36:41 by setting PC2 to 0
   PORTC &= ~0x04;
   nop();
   keys_36 = ~(PIND);
   keys_36 &= KEYS_RELEVANT_MSK;
   PORTC |= 0x04;
+  #endif
+  #if KEYS_NUMBER >= 42
   // Checking keys 42:47 by setting PC3 to 0
   PORTC &= ~0x08;
   nop();
   keys_42 = ~(PIND);
   keys_42 &= KEYS_RELEVANT_MSK;
   PORTC |= 0x08;
-#endif
-
+  #endif
   // Checking buttons_settings by setting PC4 to 0
   PORTC &= ~0x10;
   nop();
