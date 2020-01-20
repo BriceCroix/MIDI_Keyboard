@@ -3,15 +3,18 @@
  * \author Brice Croix
  */
 
-
-// The analog amplitude for one note, defining how many notes can be played at once, here 8 notes because 8*64 = 512
-#define PWM_NOTE_AMP 64
+// The timer Auto-Reload Value, that defines the resolution and the sampling rate
+#define TIMER_ARR 384u
+// The analog amplitude for one note, defining how many notes can be played at once
+#define PWM_NOTE_AMP (TIMER_ARR>>3)
 // Minimum duty value for analog output, = PWM_NOTE_AMP/2
-#define PWM_MIN ((unsigned int)PWM_NOTE_AMP >> 1)
+#define PWM_MIN (PWM_NOTE_AMP >> 1)
+// The frequency of the ATMega328p, 16 MHz
+#define ATMEGA_FREQUENCY 16000000
 // Sample frequency in Hz
-#define SAMPLE_FREQUENCY 31250
-// Sample time in micro second
-#define SAMPLE_TIME 32
+#define SAMPLE_FREQUENCY (ATMEGA_FREQUENCY / TIMER_ARR)
+// Sample time in micro second, WARNING : TIMER_ARR must be chosen so that SAMPLE_TIME is an integer
+#define SAMPLE_TIME (1000000 / SAMPLE_FREQUENCY)
 
 
 /**
@@ -65,7 +68,7 @@ void init_timer_1(){
   TCCR1A |= 1<<WGM11; // Set WGM11 to 1
   TCCR1B |= 1<<WGM13 | 1<<WGM12; // Set WGM13:12 to 1
   // In this mode the Auto-Reload value (TOP, or ARR for a STM32) is in the Input Capture Register
-  ICR1 = 0x01FF; // 512 => Sampling Frequency = 31250 Hz with 9 bits resolution
+  ICR1 = TIMER_ARR;
 
   // Connect OC1A to pin PB1 in non-inverting PWM mode, cf p108
   TCCR1A &= ~0xF0;
@@ -146,7 +149,7 @@ void setAnalogOut(){
 
   #ifdef ENABLE_VIBRATO
   // Update the frequency with its pitch shift
-  // This formula allows for 4 semitones up, more down
+  // This formula allows for 4 semitones up and a bit more than 4 semitones down
   float vibrato_T_multiplier = ADC_vibrato * -0.0032745948256492096 + 1.2095740688415495;
   #endif
 
