@@ -156,167 +156,167 @@ void setAnalogOut(){
   // Is key 0 pressed ?
   if(keys_0 & KEY_0_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 0] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 0] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 0];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 0];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 1 pressed ?
   if(keys_0 & KEY_1_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 1] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 1] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 1];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 1];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 2 pressed ?
   if(keys_0 & KEY_2_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 2] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 2] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 2];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 2];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 3 pressed ?
   if(keys_0 & KEY_3_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 3] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 3] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 3];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 3];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 4 pressed ?
   if(keys_0 & KEY_4_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 4] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 4] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 4];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 4];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 5 pressed ?
   if(keys_0 & KEY_5_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 5] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 5] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 5];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 5];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
 
   // Is key 6 pressed ?
   if(keys_6 & KEY_0_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 6] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 6] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 6];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 6];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 7 pressed ?
   if(keys_6 & KEY_1_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 7] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 7] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 7];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 7];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 8 pressed ?
   if(keys_6 & KEY_2_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 8] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 8] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 8];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 8];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 9 pressed ?
   if(keys_6 & KEY_3_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 9] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 9] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 9];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 9];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 10 pressed ?
   if(keys_6 & KEY_4_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 10] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 10] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 10];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 10];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 11 pressed ?
   if(keys_6 & KEY_5_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 11] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 11] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 11];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 11];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
 
   #if KEYS_NUMBER >= 12
   // Is key 12 pressed ?
   if(keys_12 & KEY_0_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 12] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 12] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 12];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 12];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 13 pressed ?
   if(keys_12 & KEY_1_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 13] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 13] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 13];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 13];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 14 pressed ?
   if(keys_12 & KEY_2_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 14] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 14] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 14];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 14];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 15 pressed ?
   if(keys_12 & KEY_3_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 15] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 15] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 15];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 15];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 16 pressed ?
   if(keys_12 & KEY_4_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 16] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 16] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 16];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 16];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 17 pressed ?
   if(keys_12 & KEY_5_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 17] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 17] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 17];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 17];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   #endif
 
@@ -324,56 +324,56 @@ void setAnalogOut(){
   // Is key 18 pressed ?
   if(keys_18 & KEY_0_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 18] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 18] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 18];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 18];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 19 pressed ?
   if(keys_18 & KEY_1_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 19] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 19] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 19];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 19];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 20 pressed ?
   if(keys_18 & KEY_2_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 20] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 20] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 20];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 20];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 21 pressed ?
   if(keys_18 & KEY_3_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 21] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 21] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 21];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 21];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 22 pressed ?
   if(keys_18 & KEY_4_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 22] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 22] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 22];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 22];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 23 pressed ?
   if(keys_18 & KEY_5_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 23] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 23] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 23];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 23];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   #endif
 
@@ -381,56 +381,56 @@ void setAnalogOut(){
   // Is key 24 pressed ?
   if(keys_24 & KEY_0_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 24] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 24] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 24];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 24];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 25 pressed ?
   if(keys_24 & KEY_1_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 25] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 25] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 25];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 25];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 26 pressed ?
   if(keys_24 & KEY_2_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 26] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 26] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 26];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 26];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 27 pressed ?
   if(keys_24 & KEY_3_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 27] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 27] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 27];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 27];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 28 pressed ?
   if(keys_24 & KEY_4_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 28] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 28] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 28];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 28];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 29 pressed ?
   if(keys_24 & KEY_5_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 29] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 29] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 29];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 29];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   #endif
 
@@ -438,56 +438,56 @@ void setAnalogOut(){
   // Is key 30 pressed ?
   if(keys_30 & KEY_0_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 30] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 30] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 30];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 30];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 31 pressed ?
   if(keys_30 & KEY_1_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 31] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 31] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 31];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 31];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 32 pressed ?
   if(keys_30 & KEY_2_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 32] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 32] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 32];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 32];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 33 pressed ?
   if(keys_30 & KEY_3_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 33] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 33] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 33];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 33];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 34 pressed ?
   if(keys_30 & KEY_4_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 34] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 34] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 34];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 34];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 35 pressed ?
   if(keys_30 & KEY_5_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 35] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 35] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 35];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 35];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   #endif
 
@@ -495,56 +495,56 @@ void setAnalogOut(){
   // Is key 36 pressed ?
   if(keys_36 & KEY_0_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 36] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 36] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 36];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 36];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 37 pressed ?
   if(keys_36 & KEY_1_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 37] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 37] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 37];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 37];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 38 pressed ?
   if(keys_36 & KEY_2_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 38] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 38] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 38];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 38];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 39 pressed ?
   if(keys_36 & KEY_3_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 39] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 39] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 39];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 39];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 40 pressed ?
   if(keys_36 & KEY_4_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 40] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 40] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 40];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 40];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 41 pressed ?
   if(keys_36 & KEY_5_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 41] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 41] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 41];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 41];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   #endif
 
@@ -552,56 +552,56 @@ void setAnalogOut(){
   // Is key 42 pressed ?
   if(keys_42 & KEY_0_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 42] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 42] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 42];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 42];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 43 pressed ?
   if(keys_42 & KEY_1_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 43] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 43] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 43];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 43];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 44 pressed ?
   if(keys_42 & KEY_2_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 44] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 44] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 44];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 44];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 45 pressed ?
   if(keys_42 & KEY_3_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 45] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 45] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 45];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 45];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 46 pressed ?
   if(keys_42 & KEY_4_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 46] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 46] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 46];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 46];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   // Is key 47 pressed ?
   if(keys_42 & KEY_5_MSK){
     #ifdef ENABLE_VIBRATO
-    T = PERIODS[current_pitch_0 + 47] * vibrato_T_multiplier;
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 47] * vibrato_T_multiplier;
     #else
-    T = PERIODS[current_pitch_0 + 47];
+    T = PERIODS[current_pitch_0 + FIRST_KEY + 47];
     #endif
-    analog_out_temp += (*get_wave_shape_ptr)(T);
+    analog_out_temp += getSquareWave(T, amplitude);
   }
   #endif
 

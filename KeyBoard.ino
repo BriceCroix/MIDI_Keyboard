@@ -7,20 +7,24 @@
 // Enables the debug functionalities
 //#define DEBUG
 
-/********** END-USER, PLEASE ADJUST TO FIT YOUR NEEDS **********/
-// Define the number of keys, between 12 or 48
+/********** END-USER, PLEASE ADJUST AND/OR COMMENT TO FIT YOUR NEEDS **********/
+// Define the number of keys, between 12 and 48
 #define KEYS_NUMBER 36
-/***************************************************************/
 
-/********** END-USER, PLEASE COMMENT OR UNCOMMENT TO FIT YOUR NEEDS **********/
 // Enables the tremolo and vibrato potentiometers
 #define ENABLE_TREMOLO
 #define ENABLE_VIBRATO
-/*****************************************************************************/
+
+// Defines the first key of the keyboard, between 0 for C and 11 for B on a standart keyboard
+#define FIRST_KEY 0
+
+// Defines at which note is set the keyboard, 0 for octave 0, 12 for octave 1, 24 for octave 2...
+#define DEFAULT_PITCH_0_OFFSET 36
+
+/******************************************************************************/
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-
 
 // The no-operation function as defined in assembly language
 #define nop() __asm__("nop\n\t")
@@ -31,10 +35,8 @@
 // Number of available notes
 #define NOTE_NUMBER 108
 
-/********** END-USER, PLEASE ADJUST TO FIT YOUR PREFERENCES **********/
-// Initial value of pitch_0, 0 for C0, 12 for C1, 24 for C2, 36 for C3 ...
-#define DEFAULT_PITCH_0 36;
-/*********************************************************************/
+// Initial value of pitch_0
+#define DEFAULT_PITCH_0 (FIRST_KEY + DEFAULT_PITCH_0_OFFSET);
 
 // Max value of the pitch_0 variable, depending on the number of keys
 #define MAX_PITCH_0 (NOTE_NUMBER - KEYS_NUMBER)
@@ -354,7 +356,7 @@ void process_settings(){
       // If first button was just pressed, minus an octave
       pitch_0 -= OCTAVE;
       // Verify that pitch do not goes sub 0
-      if(pitch_0 < 0) pitch_0 = 0;
+      if(pitch_0 < 0) pitch_0 = FIRST_KEY;
     }
     if((buttons_settings & KEY_1_MSK) && !(buttons_settings_last & KEY_1_MSK)){
       // If second button was just pressed, add an octave
@@ -366,7 +368,7 @@ void process_settings(){
       // If third button was just pressed, minus a semitone
       pitch_0 -= 1;
       // Verify that pitch do not goes sub 0
-      if(pitch_0 < 0) pitch_0 = 0;
+      if(pitch_0 < 0) pitch_0 = FIRST_KEY;
     }
     if((buttons_settings & KEY_3_MSK) && !(buttons_settings_last & KEY_3_MSK)){
       // If fourth button was just pressed, add a semitone
@@ -375,8 +377,8 @@ void process_settings(){
       if(pitch_0 > MAX_PITCH_0) pitch_0 = MAX_PITCH_0;
     }
     if((buttons_settings & KEY_4_MSK) && !(buttons_settings_last & KEY_4_MSK)){
-      // If fifth button was just pressed, reset pitch_0 to closest C
-      pitch_0 -= pitch_0 % OCTAVE;
+      // If fifth button was just pressed, reset pitch_0
+      pitch_0 = DEFAULT_PITCH_0;
     }
   }
 }
