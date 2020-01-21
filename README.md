@@ -27,7 +27,7 @@ Enjoy !
 
 ## What does the code do ?
 
-Using the ATMega328p datasheet may be useful in order to fully understand the provided code. It is available [here](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf).
+Using the ATMega328p datasheet may be useful in order to fully understand the provided code. It is available [here](http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf) (I am not affiliated with microchip in any way).
 
 ### Handling the keys
 
@@ -37,9 +37,9 @@ Due to the number of keys meant to be connected to the chip, it was not possible
 
 The analog mode aims at creating analog audio data, using the timer 1 of the ATMega to handle time measurement and PWM output. According to the ATMega documentation, the pin PB1 is internally connected to the PWM output of the Timer 1.
 
-When the timer hits its auto-reload value, that defines the sampling rate, the software uses all keys state to compute the level of the selected wave shape. this number then defines the PWM ratio, indeed the value of the analog output for this sample.
+When the timer hits its auto-reload value, that defines the sampling rate, the software uses all keys state to compute the level of the selected wave shape. This number then defines the PWM ratio, indeed the value of the analog output for this sample.
 
-The ADC is used to know the value of the pitch and volume wheels. The pitch wheel shortens or lengthen the period of each note, and the volume one modifies its amplitude. When both wheels are enabled, the ADC switches what wheel to scan each time it finishes a conversion.
+The ADC is used to know the value of the pitch and volume wheels. The pitch wheel shortens or lengthens the period of each note, and the volume one modifies its amplitude. When both wheels are enabled, the ADC switches from what wheel to scan each time it finishes a conversion.
 
 ### MIDI mode
 
@@ -64,6 +64,9 @@ This circuit features a MIDI switch in order to deactivate the MIDI connector in
 ![schematics](Keyboard_schematics.png)
 
 This circuit has been created using the free software Kicad, the source files are available in the repository under `Kicad_files/`.
+## License
+
+This project uses an MIT License, see `./LICENSE.md`.
 
 ## Credits
 
