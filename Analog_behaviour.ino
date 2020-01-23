@@ -160,7 +160,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 0];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 1 pressed ?
   if(keys_0 & KEY_1_MSK){
@@ -169,7 +169,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 1];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 2 pressed ?
   if(keys_0 & KEY_2_MSK){
@@ -178,7 +178,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 2];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 3 pressed ?
   if(keys_0 & KEY_3_MSK){
@@ -187,7 +187,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 3];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 4 pressed ?
   if(keys_0 & KEY_4_MSK){
@@ -196,7 +196,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 4];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 5 pressed ?
   if(keys_0 & KEY_5_MSK){
@@ -205,7 +205,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 5];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
 
   // Is key 6 pressed ?
@@ -215,7 +215,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 6];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 7 pressed ?
   if(keys_6 & KEY_1_MSK){
@@ -224,7 +224,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 7];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 8 pressed ?
   if(keys_6 & KEY_2_MSK){
@@ -233,7 +233,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 8];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 9 pressed ?
   if(keys_6 & KEY_3_MSK){
@@ -242,7 +242,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 9];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 10 pressed ?
   if(keys_6 & KEY_4_MSK){
@@ -251,7 +251,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 10];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 11 pressed ?
   if(keys_6 & KEY_5_MSK){
@@ -260,7 +260,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 11];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
 
   #if KEYS_NUMBER >= 12
@@ -271,7 +271,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 12];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 13 pressed ?
   if(keys_12 & KEY_1_MSK){
@@ -280,7 +280,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 13];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 14 pressed ?
   if(keys_12 & KEY_2_MSK){
@@ -289,7 +289,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 14];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 15 pressed ?
   if(keys_12 & KEY_3_MSK){
@@ -298,7 +298,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 15];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 16 pressed ?
   if(keys_12 & KEY_4_MSK){
@@ -307,7 +307,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 16];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 17 pressed ?
   if(keys_12 & KEY_5_MSK){
@@ -316,7 +316,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 17];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   #endif
 
@@ -328,7 +328,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 18];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 19 pressed ?
   if(keys_18 & KEY_1_MSK){
@@ -337,7 +337,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 19];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 20 pressed ?
   if(keys_18 & KEY_2_MSK){
@@ -346,7 +346,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 20];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 21 pressed ?
   if(keys_18 & KEY_3_MSK){
@@ -355,7 +355,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 21];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 22 pressed ?
   if(keys_18 & KEY_4_MSK){
@@ -364,7 +364,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 22];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 23 pressed ?
   if(keys_18 & KEY_5_MSK){
@@ -373,7 +373,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 23];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   #endif
 
@@ -385,7 +385,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 24];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 25 pressed ?
   if(keys_24 & KEY_1_MSK){
@@ -394,7 +394,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 25];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 26 pressed ?
   if(keys_24 & KEY_2_MSK){
@@ -403,7 +403,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 26];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 27 pressed ?
   if(keys_24 & KEY_3_MSK){
@@ -412,7 +412,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 27];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 28 pressed ?
   if(keys_24 & KEY_4_MSK){
@@ -421,7 +421,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 28];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 29 pressed ?
   if(keys_24 & KEY_5_MSK){
@@ -430,7 +430,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 29];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   #endif
 
@@ -442,7 +442,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 30];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 31 pressed ?
   if(keys_30 & KEY_1_MSK){
@@ -451,7 +451,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 31];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 32 pressed ?
   if(keys_30 & KEY_2_MSK){
@@ -460,7 +460,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 32];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 33 pressed ?
   if(keys_30 & KEY_3_MSK){
@@ -469,7 +469,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 33];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 34 pressed ?
   if(keys_30 & KEY_4_MSK){
@@ -478,7 +478,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 34];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 35 pressed ?
   if(keys_30 & KEY_5_MSK){
@@ -487,7 +487,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 35];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   #endif
 
@@ -499,7 +499,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 36];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 37 pressed ?
   if(keys_36 & KEY_1_MSK){
@@ -508,7 +508,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 37];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 38 pressed ?
   if(keys_36 & KEY_2_MSK){
@@ -517,7 +517,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 38];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 39 pressed ?
   if(keys_36 & KEY_3_MSK){
@@ -526,7 +526,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 39];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 40 pressed ?
   if(keys_36 & KEY_4_MSK){
@@ -535,7 +535,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 40];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 41 pressed ?
   if(keys_36 & KEY_5_MSK){
@@ -544,7 +544,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 41];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   #endif
 
@@ -556,7 +556,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 42];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 43 pressed ?
   if(keys_42 & KEY_1_MSK){
@@ -565,7 +565,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 43];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 44 pressed ?
   if(keys_42 & KEY_2_MSK){
@@ -574,7 +574,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 44];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 45 pressed ?
   if(keys_42 & KEY_3_MSK){
@@ -583,7 +583,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 45];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 46 pressed ?
   if(keys_42 & KEY_4_MSK){
@@ -592,7 +592,7 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 46];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   // Is key 47 pressed ?
   if(keys_42 & KEY_5_MSK){
@@ -601,9 +601,10 @@ void setAnalogOut(){
     #else
     T = PERIODS[current_pitch_0 + FIRST_KEY + 47];
     #endif
-    analog_out_temp += getSquareWave(T, amplitude);
+    analog_out_temp += get_wave_shape_ptr(T);
   }
   #endif
+
 
   // Actually update the analog value
   analog_out_temp *= PWM_NOTE_AMP;
