@@ -12,7 +12,7 @@
 
 // Enables the tremolo and vibrato potentiometers
 #define ENABLE_TREMOLO
-//#define ENABLE_VIBRATO
+#define ENABLE_VIBRATO
 
 // Defines the first key of the keyboard, between 0 for C and 11 for B on a standart keyboard
 #define FIRST_KEY 0
@@ -26,7 +26,7 @@
 #include <avr/io.h>
 
 // Enables the debug functionalities
-#define DEBUG
+//#define DEBUG
 
 // The no-operation function as defined in assembly language
 #define nop() __asm__("nop\n\t")
