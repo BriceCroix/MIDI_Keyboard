@@ -3,24 +3,12 @@
  * \author Brice Croix
  */
 
-// The timer Auto-Reload Value, that defines the resolution and the sampling rate
-#define TIMER_ARR 384u
-// The analog amplitude for one note, defining how many notes can be played at once
-#define PWM_NOTE_AMP (TIMER_ARR>>3)
-// Minimum duty value for analog output, = PWM_NOTE_AMP/2
-#define PWM_MIN (PWM_NOTE_AMP >> 1)
-// The frequency of the ATMega328p, 16 MHz
-#define ATMEGA_FREQUENCY 16000000
-// Sample frequency in Hz
-#define SAMPLE_FREQUENCY (ATMEGA_FREQUENCY / TIMER_ARR)
-// Sample time in micro second, WARNING : TIMER_ARR must be chosen so that SAMPLE_TIME is an integer
-#define SAMPLE_TIME (1000000 / SAMPLE_FREQUENCY)
-
+#include "analog_behaviour.h"
 
 /**
  * \brief Each period in us from C0 to B8
  */
-const uint16_t PERIODS[] = {
+static const uint16_t PERIODS[] = {
   61156, 57724, 54484, 51426, 48540, 45815, 43244, 40817, 38526, 36364, 34323, 32396, //C0 to B0
   30578, 28862, 27242, 25713, 24270, 22908, 21622, 20408, 19263, 18182, 17161, 16198, //C1 to B1
   15289, 14431, 13621, 12856, 12135, 11454, 10811, 10204, 9631,  9091,  8581,  8099,  //C2 to B2
@@ -32,25 +20,14 @@ const uint16_t PERIODS[] = {
   239,   225,   213,   201,   190,   179,   169,   159,   150,   142,   134,   127    //C8 to B8
 };
 
-
-/**
- * \brief time in micro second
- */
+// define global variables declared in analog_behaviour.h
 volatile uint64_t t = 0;
 
-/**
- * \brief the analog value to write on the analog output
- */
 volatile uint16_t analog_out = 0;
 
-/**
- * \brief a function pointer to the wave function to use to compute analog output
- */
 float (*get_wave_shape_ptr)(uint16_t period) = &getSquareWave;
 
-/**
- * \brief Sets timer 1 in condition to generate PWM signal
- */
+
 void init_timer_1(){
   // Enable timer1 with no prescaler, cf doc p110
   TCCR1B &= ~0x07; // Clears bits CS10:12 that handle timer activation
@@ -97,11 +74,7 @@ ISR(TIMER1_OVF_vect){
   setAnalogOut();
 }
 
-/**
- * \brief computes the value of a square wave at time t
- * \param[in] period period of the wave to compute, in us
- * \return value of wave to compute, between 0 and 1
- */
+
 float getSquareWave(uint16_t period){
   if(t%period < (period>>1)){
     //High
@@ -112,11 +85,7 @@ float getSquareWave(uint16_t period){
   }
 }
 
-/**
- * \brief computes the value of a triangle wave at time t
- * \param[in] period period of the wave to compute, in us
- * \return value of wave to compute, between 0 and 1
- */
+
 float getTriangleWave(uint16_t period){
   uint16_t half_period = period>>1;
   if ((t%period) < half_period){
@@ -126,19 +95,12 @@ float getTriangleWave(uint16_t period){
   }
 }
 
-/**
- * \brief computes the value of a rising saw wave at time t
- * \param[in] period period of the wave to compute, in us
- * \return value of wave to compute, between 0 and 1
- */
+
 float getSawWave(uint16_t period){
   return (float)(t%period) / period;
 }
 
 
-/**
- * \brief Sets the analog_out value according to the keys state.
- */
 void setAnalogOut(){
   // In order not to access memory multiple times
   uint8_t current_pitch_0 = pitch_0;
@@ -618,9 +580,6 @@ void setAnalogOut(){
 }
 
 
-/**
- * \brief sets the arduino in order to output analog signal
- */
 void analog_behaviour(){
   // Turn OFF the midi LED
   PORTC &= ~(1<<DDC5);

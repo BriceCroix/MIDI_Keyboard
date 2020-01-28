@@ -4,65 +4,12 @@
  * \date june 25 of 2019
  */
 
-// Enables the debug functionalities
-//#define DEBUG
-
-/********** END-USER, PLEASE ADJUST AND/OR COMMENT TO FIT YOUR NEEDS **********/
-// Define the number of keys, between 12 and 48
-#define KEYS_NUMBER 36
-
-// Enables the tremolo and vibrato potentiometers
-#define ENABLE_TREMOLO
-#define ENABLE_VIBRATO
-
-// Defines the first key of the keyboard, between 0 for C and 11 for B on a standart keyboard
-#define FIRST_KEY 0
-
-// Defines at which note is set the keyboard, 0 for octave 0, 12 for octave 1, 24 for octave 2...
-#define DEFAULT_PITCH_0_OFFSET 36
-
-/******************************************************************************/
+#include "keyboard.h"
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-// The no-operation function as defined in assembly language
-#define nop() __asm__("nop\n\t")
-
-// Number of notes per octave
-#define OCTAVE 12
-
-// Number of available notes
-#define NOTE_NUMBER 108
-
-// Initial value of pitch_0
-#define DEFAULT_PITCH_0 (FIRST_KEY + DEFAULT_PITCH_0_OFFSET);
-
-// Max value of the pitch_0 variable, depending on the number of keys
-#define MAX_PITCH_0 (NOTE_NUMBER - KEYS_NUMBER)
-
-// Masks to check keys level in a key group
-#define KEY_0_MSK 0x04
-#define KEY_1_MSK 0x08
-#define KEY_2_MSK 0x10
-#define KEY_3_MSK 0x20
-#define KEY_4_MSK 0x40
-#define KEY_5_MSK 0x80
-#define KEYS_RELEVANT_MSK 0xFC
-
-/**
- * \brief Macro function to send a byte, waits for buffer to be empty
- */
-#define USART_SEND(byte) while(!(UCSR0A & 0x20)); UDR0 = byte
-
-/**
- * \brief Stores state of keys 0 to 5, same goes for key_6, key_12 etc. Only the 6 MSB are relevant on these variables. [k5,k4,k3,k2,k1,k0,xx,xx]
- */
 volatile uint8_t keys_0 = 0;
-
-/**
- * \brief stores the state of the keys at last sample
- */
 volatile uint8_t keys_0_last = 0;
 volatile uint8_t keys_6 = 0;
 volatile uint8_t keys_6_last = 0;
@@ -93,40 +40,23 @@ volatile uint8_t keys_42_last = 0;
 volatile uint8_t buttons_settings = 0;
 volatile uint8_t buttons_settings_last = 0;
 
-/**
- * \brief index of the lowest key, 0 for C0, 2 for D0, 12 for C1...
- */
 volatile int8_t pitch_0 = DEFAULT_PITCH_0;
 
-
 #ifdef ENABLE_VIBRATO
-/**
- * \brief Stores the value of the vibrato potentiometer
- */
-volatile uint8_t ADC_vibrato = 64;
 
-/**
- * \brief A flag to indicate that the ADC vibrato value has been updated
- */
+volatile uint8_t ADC_vibrato = 64;
 volatile uint8_t ADC_vibrato_flag = 0;
+
 #endif
 
 #ifdef ENABLE_TREMOLO
-/**
- * \brief Stores the value of the tremolo potentiometer
- */
-volatile uint8_t ADC_tremolo = 64;
 
-/**
- * \brief A flag to indicate that the ADC tremolo value has been updated
- */
+volatile uint8_t ADC_tremolo = 64;
 volatile uint8_t ADC_tremolo_flag = 0;
+
 #endif
 
 
-/**
- * \brief Sets pins PD7:2 as pulled-up inputs and pins PB5:0, PC3:0 as outputs
- */
 void init_pins(){
   // Enabling pull-ups for all ports
   MCUCR &= ~0x10;
@@ -170,47 +100,43 @@ void init_pins(){
 
 
 #if defined ENABLE_VIBRATO || defined ENABLE_TREMOLO
-/**
- * \brief Enables the ADC for volume and pitch bends
- */
- void init_adc(){
-   // Reference is AVcc = 5V
-   // Result is left aligned
-   ADMUX = (1<<REFS0) | (1<<ADLAR);
 
-   // ADC Enable
-   ADCSRA |= (1<<ADEN);
+void init_adc(){
+// Reference is AVcc = 5V
+// Result is left aligned
+ADMUX = (1<<REFS0) | (1<<ADLAR);
 
-   // Clear Prescaler
-   ADCSRA &= ~((1<<ADPS0) | (1<<ADPS1) | (1<<ADPS2) );
-   #if defined ENABLE_VIBRATO && defined ENABLE_TREMOLO
-   // Prescaler of 128, ADC_CLK = 125kHz
-   ADCSRA |= (1<<ADPS0)|(1<<ADPS1)|(1<<ADPS2);
-   #else
-   // Prescaler of 64, ADC_CLK = 250kHz
-   ADCSRA |= (1<<ADPS1)|(1<<ADPS2);
-   #endif
+// ADC Enable
+ADCSRA |= (1<<ADEN);
 
-   // For now ADC connected to pin A6
-   ADMUX |= (1<<MUX2)|(1<<MUX1);
-   #ifdef ENABLE_VIBRATO
-   // Connect to A7
-   ADMUX |= (1<<MUX0);
-   #endif
-
-   // start single conversion by writing ’1′ to ADSC
-   // Useful since first conversion is longer
-   // This bit will be ON untill conversion is done
-   ADCSRA |= (1<<ADSC);
-   while(ADCSRA & (1<<ADSC) );
-
-   //Result will be readable in ADCH
- }
+// Clear Prescaler
+ADCSRA &= ~((1<<ADPS0) | (1<<ADPS1) | (1<<ADPS2) );
+#if defined ENABLE_VIBRATO && defined ENABLE_TREMOLO
+// Prescaler of 128, ADC_CLK = 125kHz
+ADCSRA |= (1<<ADPS0)|(1<<ADPS1)|(1<<ADPS2);
+#else
+// Prescaler of 64, ADC_CLK = 250kHz
+ADCSRA |= (1<<ADPS1)|(1<<ADPS2);
 #endif
 
-/**
- * \brief update the values of all keys and option buttons
- */
+// For now ADC connected to pin A6
+ADMUX |= (1<<MUX2)|(1<<MUX1);
+#ifdef ENABLE_VIBRATO
+// Connect to A7
+ADMUX |= (1<<MUX0);
+#endif
+
+// start single conversion by writing ’1′ to ADSC
+// Useful since first conversion is longer
+// This bit will be ON untill conversion is done
+ADCSRA |= (1<<ADSC);
+while(ADCSRA & (1<<ADSC) );
+
+//Result will be readable in ADCH
+}
+#endif
+
+
 void read_buttons(){
   // Checking keys 0:5 by setting PB0 to 0, a no_operation is required for sync, see datasheet p60
   PORTB &= ~0x01;
@@ -281,13 +207,6 @@ void read_buttons(){
 }
 
 
-#if defined ENABLE_VIBRATO || defined ENABLE_TREMOLO
-/**
- * \brief update, if available, the value of potentiometers
- */
-void read_pots();
-#endif
-
 // switch read_pots implementation
 #if defined ENABLE_VIBRATO && defined ENABLE_TREMOLO
 void read_pots(){
@@ -353,9 +272,6 @@ void read_pots(){
 #endif
 
 
-/**
- * \brief Handles the settings buttons, without updating buttons_settings_last
- */
 void process_settings(){
   if(buttons_settings & KEYS_RELEVANT_MSK){
     // If at least one button is pressed
@@ -388,37 +304,4 @@ void process_settings(){
       pitch_0 = DEFAULT_PITCH_0;
     }
   }
-}
-
-
-/**
- * \brief main function containing the choice between analog and MIDI mode
- */
-int main(){
-  // Disable interrupts while initializing, cf p11 doc
-  SREG &= ~0x80;
-  init_pins();
-
-  #if defined ENABLE_VIBRATO || defined ENABLE_TREMOLO
-  init_adc();
-  #endif
-
-  //Turn ON analog and midi LEDs
-  PORTB |= (1<<DDB5);
-  PORTC |= (1<<DDC5);
-
-  // Wait until user press key 0 or key 1
-  while( ((keys_0 & KEY_0_MSK) == 0) && ((keys_0 & KEY_1_MSK) == 0)){
-    read_buttons();
-  }
-
-  // Switch between analog and MIDI depending on the pressed key
-  if(keys_0 & KEY_0_MSK){
-    analog_behaviour();
-  }else if(keys_0 & KEY_1_MSK){
-    midi_behaviour();
-  }
-
-  // Program won't actually go here
-  return EXIT_FAILURE;
 }
