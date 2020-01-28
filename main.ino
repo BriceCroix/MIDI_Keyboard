@@ -10,7 +10,7 @@ int main(){
   SREG &= ~0x80;
   init_pins();
 
-  #if defined ENABLE_VIBRATO || defined ENABLE_TREMOLO
+  #if (defined ENABLE_VIBRATO) || (defined ENABLE_TREMOLO)
   init_adc();
   #endif
 

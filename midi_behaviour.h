@@ -8,6 +8,7 @@
 #define MIDI_BEHAVIOUR_H
 
 #include "keyboard.h"
+#include <stdlib.h>
 
 /**
  * \brief Macro function to send a byte, waits for buffer to be empty

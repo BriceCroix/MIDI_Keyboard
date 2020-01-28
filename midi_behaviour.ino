@@ -554,7 +554,7 @@ void midi_behaviour(){
   SREG |= 0x80;
 
   while(1){
-    #if defined ENABLE_VIBRATO || defined ENABLE_TREMOLO
+    #if (defined ENABLE_VIBRATO) || (defined ENABLE_TREMOLO)
     // Recover value from vibrato and tremolo pots
     read_pots();
     #endif

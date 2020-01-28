@@ -99,7 +99,7 @@ void init_pins(){
 }
 
 
-#if defined ENABLE_VIBRATO || defined ENABLE_TREMOLO
+#if (defined ENABLE_VIBRATO) || (defined ENABLE_TREMOLO)
 
 void init_adc(){
 // Reference is AVcc = 5V
@@ -111,7 +111,7 @@ ADCSRA |= (1<<ADEN);
 
 // Clear Prescaler
 ADCSRA &= ~((1<<ADPS0) | (1<<ADPS1) | (1<<ADPS2) );
-#if defined ENABLE_VIBRATO && defined ENABLE_TREMOLO
+#if (defined ENABLE_VIBRATO) && (defined ENABLE_TREMOLO)
 // Prescaler of 128, ADC_CLK = 125kHz
 ADCSRA |= (1<<ADPS0)|(1<<ADPS1)|(1<<ADPS2);
 #else
@@ -208,7 +208,7 @@ void read_buttons(){
 
 
 // switch read_pots implementation
-#if defined ENABLE_VIBRATO && defined ENABLE_TREMOLO
+#if (defined ENABLE_VIBRATO) && (defined ENABLE_TREMOLO)
 void read_pots(){
   // If no ADC conversion is running
   if( !(ADCSRA & (1<<ADSC)) ){
@@ -238,7 +238,7 @@ void read_pots(){
   }
 }
 
-#elif defined ENABLE_VIBRATO && not defined ENABLE_TREMOLO
+#elif (defined ENABLE_VIBRATO) && !(defined ENABLE_TREMOLO)
 void read_pots(){
   // If no ADC conversion is running
   if( !(ADCSRA & (1<<ADSC)) ){
@@ -254,7 +254,7 @@ void read_pots(){
   }
 }
 
-#elif not defined ENABLE_VIBRATO && defined ENABLE_TREMOLO
+#elif !(defined ENABLE_VIBRATO) && (defined ENABLE_TREMOLO)
 void read_pots(){
   // If no ADC conversion is running
   if( !(ADCSRA & (1<<ADSC)) ){

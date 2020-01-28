@@ -1,3 +1,7 @@
 # Ignore Kicad cache and backup files
 *cache*
 *.bak
+
+# Ignore object files and executables
+*.o
+*.elf

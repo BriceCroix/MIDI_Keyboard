@@ -22,6 +22,8 @@
 
 /********** END OF END-USER MODIFICATIONS *************************************/
 
+#include <stdlib.h>
+#include <avr/io.h>
 
 // Enables the debug functionalities
 #define DEBUG
@@ -36,7 +38,7 @@
 #define NOTE_NUMBER 108
 
 // Initial value of pitch_0
-#define DEFAULT_PITCH_0 (FIRST_KEY + DEFAULT_PITCH_0_OFFSET);
+#define DEFAULT_PITCH_0 (FIRST_KEY + DEFAULT_PITCH_0_OFFSET)
 
 // Max value of the pitch_0 variable, depending on the number of keys
 #define MAX_PITCH_0 (NOTE_NUMBER - KEYS_NUMBER)
@@ -123,7 +125,7 @@ extern volatile uint8_t ADC_tremolo_flag;
  */
 void init_pins();
 
-#if defined ENABLE_VIBRATO || defined ENABLE_TREMOLO
+#if (defined ENABLE_VIBRATO) || (defined ENABLE_TREMOLO)
 /**
  * \brief Enables the ADC for volume and pitch bends
  */

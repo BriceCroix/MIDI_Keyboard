@@ -595,7 +595,7 @@ void analog_behaviour(){
   #endif
 
   while(1){
-    #if defined ENABLE_VIBRATO || defined ENABLE_TREMOLO
+    #if (defined ENABLE_VIBRATO) || (defined ENABLE_TREMOLO)
     // Recover value from vibrato and tremolo pots
     read_pots();
 

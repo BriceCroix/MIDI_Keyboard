@@ -10,6 +10,8 @@
 #ifdef DEBUG
 #include "midi_behaviour.h"
 #endif
+#include <stdlib.h>
+#include <avr/interrupt.h>
 
 // The timer Auto-Reload Value, that defines the resolution and the sampling rate
 #define TIMER_ARR 384u
