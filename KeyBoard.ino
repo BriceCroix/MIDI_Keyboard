@@ -180,9 +180,16 @@ void init_pins(){
 
    // ADC Enable
    ADCSRA |= (1<<ADEN);
-   // Prescaler of 128, ADC_CLK = 125kHz
+
+   // Clear Prescaler
    ADCSRA &= ~((1<<ADPS0) | (1<<ADPS1) | (1<<ADPS2) );
-   ADCSRA |= (1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
+   #if defined ENABLE_VIBRATO && defined ENABLE_TREMOLO
+   // Prescaler of 128, ADC_CLK = 125kHz
+   ADCSRA |= (1<<ADPS0)|(1<<ADPS1)|(1<<ADPS2);
+   #else
+   // Prescaler of 64, ADC_CLK = 250kHz
+   ADCSRA |= (1<<ADPS1)|(1<<ADPS2);
+   #endif
 
    // For now ADC connected to pin A6
    ADMUX |= (1<<MUX2)|(1<<MUX1);
@@ -192,8 +199,8 @@ void init_pins(){
    #endif
 
    // start single conversion by writing ’1′ to ADSC
-   //Useful since first conversion is longer
-   //This bit will be ON untill conversion is done
+   // Useful since first conversion is longer
+   // This bit will be ON untill conversion is done
    ADCSRA |= (1<<ADSC);
    while(ADCSRA & (1<<ADSC) );
 
