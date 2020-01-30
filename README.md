@@ -82,7 +82,7 @@ Here is a proposition of the full circuit, including :
 
 This circuit features a MIDI switch in order to deactivate the MIDI connector in order to use the USB port integrated on a common Arduino Nano Board, which is linked to the UART module.
 
-![schematics](Keyboard_schematics.png)
+![schematics](Kicad_files/Keyboard_schematics.png)
 
 This circuit has been created using the free software Kicad, the source files are available in the repository under `Kicad_files/`.
 
