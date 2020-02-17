@@ -32,9 +32,9 @@
 extern volatile uint64_t t;
 
 /**
- * \brief the analog value to write on the analog output
+ * \brief a token, created for each sample update, each SAMPLE_TIME 
  */
-extern volatile uint16_t analog_out;
+extern volatile uint8_t token_sample_update;
 
 /**
  * \brief a function pointer to the wave function to use to compute analog output

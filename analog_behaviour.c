@@ -23,7 +23,7 @@ static const uint16_t PERIODS[] = {
 // define global variables declared in analog_behaviour.h
 volatile uint64_t t = 0;
 
-volatile uint16_t analog_out = 0;
+volatile uint8_t token_sample_update = 0;
 
 float (*get_wave_shape_ptr)(uint16_t period) = &getSquareWave;
 
@@ -64,14 +64,11 @@ void init_timer_1(){
  * \brief interruption code when an ovf occurs on timer 1
  */
 ISR(TIMER1_OVF_vect){
-  // Let us update the analog pin output value
-  OCR1A = analog_out;
-
   // Let us update time
   t += SAMPLE_TIME;
 
-  // Update analog value for next sample
-  setAnalogOut();
+  // Generate a token to compute next sample
+  token_sample_update = 1;
 }
 
 
@@ -112,8 +109,10 @@ void setAnalogOut(){
   #ifdef ENABLE_VIBRATO
   // Update the frequency with its pitch shift
   // This formula allows for 4 semitones up and a bit more than 4 semitones down
-  float vibrato_T_multiplier = ADC_vibrato * -0.0032745948256492096 + 1.2095740688415495;
+  float vibrato_T_multiplier = ADC_vibrato * (-0.0032745948256492096) + 1.2095740688415495;
   #endif
+
+  // All following lines are unrolled to enhance computation time
 
   // Is key 0 pressed ?
   if(keys_0 & KEY_0_MSK){
@@ -571,11 +570,11 @@ void setAnalogOut(){
   // Actually update the analog value
   analog_out_temp *= PWM_NOTE_AMP;
   #ifdef ENABLE_TREMOLO
-  // Update the velocity multiplier
+  // Let us update the analog pin output value
   // This formula allows for nulling or doubling the velocity (number is 1/64)
-  analog_out = PWM_MIN + analog_out_temp * ADC_tremolo * 0.015625;
+  OCR1A = PWM_MIN + analog_out_temp * ADC_tremolo * 0.015625;
   #else
-  analog_out = PWM_MIN + analog_out_temp;
+  OCR1A = PWM_MIN + analog_out_temp;
   #endif
 }
 
@@ -595,8 +594,13 @@ void analog_behaviour(){
   #endif
 
   while(1){
-    #if (defined ENABLE_VIBRATO) || (defined ENABLE_TREMOLO)
+    // Wait for a token to be generated
+    while(!token_sample_update);
+    // Use the token
+    token_sample_update = 0;
+
     // Recover value from vibrato and tremolo pots
+    #if (defined ENABLE_VIBRATO) || (defined ENABLE_TREMOLO)
     read_pots();
 
     #ifdef DEBUG
@@ -620,6 +624,9 @@ void analog_behaviour(){
 
     // Update the buttons and keys value
     read_buttons();
+
+    // Update analog value for next sample
+    setAnalogOut();
 
     // Handle octave and semitones change
     process_settings();

@@ -9,50 +9,51 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-volatile uint8_t keys_0 = 0;
-volatile uint8_t keys_0_last = 0;
-volatile uint8_t keys_6 = 0;
-volatile uint8_t keys_6_last = 0;
+// Define global variables declared in keyboard.h
+uint8_t keys_0 = 0;
+uint8_t keys_0_last = 0;
+uint8_t keys_6 = 0;
+uint8_t keys_6_last = 0;
 #if KEYS_NUMBER >= 12
-volatile uint8_t keys_12 = 0;
-volatile uint8_t keys_12_last = 0;
+uint8_t keys_12 = 0;
+uint8_t keys_12_last = 0;
 #endif
 #if KEYS_NUMBER >= 18
-volatile uint8_t keys_18 = 0;
-volatile uint8_t keys_18_last = 0;
+uint8_t keys_18 = 0;
+uint8_t keys_18_last = 0;
 #endif
 #if KEYS_NUMBER >= 24
-volatile uint8_t keys_24 = 0;
-volatile uint8_t keys_24_last = 0;
+uint8_t keys_24 = 0;
+uint8_t keys_24_last = 0;
 #endif
 #if KEYS_NUMBER >= 30
-volatile uint8_t keys_30 = 0;
-volatile uint8_t keys_30_last = 0;
+uint8_t keys_30 = 0;
+uint8_t keys_30_last = 0;
 #endif
 #if KEYS_NUMBER >= 36
-volatile uint8_t keys_36 = 0;
-volatile uint8_t keys_36_last = 0;
+uint8_t keys_36 = 0;
+uint8_t keys_36_last = 0;
 #endif
 #if KEYS_NUMBER >= 42
-volatile uint8_t keys_42 = 0;
-volatile uint8_t keys_42_last = 0;
+uint8_t keys_42 = 0;
+uint8_t keys_42_last = 0;
 #endif
-volatile uint8_t buttons_settings = 0;
-volatile uint8_t buttons_settings_last = 0;
+uint8_t buttons_settings = 0;
+uint8_t buttons_settings_last = 0;
 
-volatile int8_t pitch_0 = DEFAULT_PITCH_0;
+int8_t pitch_0 = DEFAULT_PITCH_0;
 
 #ifdef ENABLE_VIBRATO
 
-volatile uint8_t ADC_vibrato = 64;
-volatile uint8_t ADC_vibrato_flag = 0;
+uint8_t ADC_vibrato = 64;
+uint8_t ADC_vibrato_flag = 0;
 
 #endif
 
 #ifdef ENABLE_TREMOLO
 
-volatile uint8_t ADC_tremolo = 64;
-volatile uint8_t ADC_tremolo_flag = 0;
+uint8_t ADC_tremolo = 64;
+uint8_t ADC_tremolo_flag = 0;
 
 #endif
 
