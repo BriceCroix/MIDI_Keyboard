@@ -92,6 +92,8 @@ This circuit has been created using the free software Kicad, the source files ar
 
 This project uses an MIT License, see `LICENSE.md`.
 
+--------------------------------------------------------------------------------
+
 ## Credits
 
 *Brice Croix, 2020*
